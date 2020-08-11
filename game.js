@@ -4,8 +4,8 @@ window.addEventListener('load', function () {
     const context = canvas.getContext('2d') // For manipulating the canvas object
 
     //Set Logical canvas dimensions != intrinsic canvas size
-    canvas.width = 1034
-    canvas.height = 658
+    canvas.width = 500 //1034
+    canvas.height = 500 //658
 
     //Pixelate Image
     context.imageSmoothingEnabled = false
@@ -305,22 +305,7 @@ window.addEventListener('load', function () {
         this.animation = this.animations['walkdown']
         Animator.call(this, this.animation, 3, 'pause')
 
-        this.update = function () {
-            this.mode = 'loop'
-            if (controller.up.active) {
-                this.moveUp()
-                this.changeAnimation(this.animations['walkup'], 'loop')
-            } else if (controller.right.active) {
-                this.moveRight()
-                this.changeAnimation(this.animations['walkright'], 'loop')
-            } else if (controller.down.active) {
-                this.moveDown()
-                this.changeAnimation(this.animations['walkdown'], 'loop')
-            } else if (controller.left.active) {
-                this.moveLeft()
-                this.changeAnimation(this.animations['walkleft'], 'loop')
-            } else this.mode = 'pause'
-        }
+        this.update = function () {}
     }
 
     //create player object
@@ -391,11 +376,44 @@ window.addEventListener('load', function () {
     }
 
     const enemy = new Enemy()
-    //Update animation for every frame
+
+    const Camera = function () {
+        this.x = 0
+        this.y = 0
+        this.width = 500
+        this.height = 500
+        //    canvas.width = 1034 canvas.height = 658
+        this.moveCamera = function (dx, dy) {
+            if (!world.boundary.collide(player)) {
+                this.x += dx
+                this.y += dy
+            }
+        }
+    }
+
+    const camera = new Camera()
+
     const update = function () {
+        player.mode = 'loop'
+        if (controller.up.active) {
+            player.moveUp()
+            player.changeAnimation(player.animations['walkup'], 'loop')
+        } else if (controller.right.active) {
+            player.moveRight()
+            player.changeAnimation(player.animations['walkright'], 'loop')
+            camera.moveCamera(player.speed, 0)
+        } else if (controller.down.active) {
+            player.moveDown()
+            player.changeAnimation(player.animations['walkdown'], 'loop')
+        } else if (controller.left.active) {
+            player.moveLeft()
+            player.changeAnimation(player.animations['walkleft'], 'loop')
+            camera.moveCamera(-player.speed, 0)
+        } else player.mode = 'pause'
+        player.update()
+
         world.boundary.collide(player)
         //world.doorway.collide(player);
-        player.update()
         player.animate()
         enemy.animate()
         ;[enemy].forEach((object) => {
@@ -429,8 +447,8 @@ window.addEventListener('load', function () {
                             (world.sourceTileHeight + world.borderWidth),
                     world.sourceTileWidth,
                     world.sourceTileHeight,
-                    world.tileWidth * row,
-                    world.tileHeight * column,
+                    world.tileWidth * row - camera.x,
+                    world.tileHeight * column - camera.y,
                     world.tileWidth,
                     world.tileHeight
                 )
@@ -449,8 +467,8 @@ window.addEventListener('load', function () {
                             (world.sourceTileHeight + world.borderWidth),
                     world.sourceTileWidth,
                     world.sourceTileHeight,
-                    world.tileWidth * row,
-                    world.tileHeight * column,
+                    world.tileWidth * row - camera.x,
+                    world.tileHeight * column - camera.y,
                     world.tileWidth,
                     world.tileHeight
                 )
@@ -463,11 +481,25 @@ window.addEventListener('load', function () {
             enemy.frame.source_y,
             enemy.frame.source_width,
             enemy.frame.source_height,
-            enemy.x,
-            enemy.y,
+            enemy.x - camera.x,
+            enemy.y - camera.y,
             enemy.width,
             enemy.height
         )
+
+        context.drawImage(
+            player.sprite,
+            player.frame.source_x,
+            player.frame.source_y,
+            player.frame.source_width,
+            player.frame.source_height,
+            player.x - camera.x,
+            player.y - camera.y,
+            player.width,
+            player.height
+        )
+
+        /*
         context.beginPath()
         context.rect(
             enemy.getLeft(),
@@ -476,19 +508,6 @@ window.addEventListener('load', function () {
             enemy.getBottom() - enemy.getTop()
         )
         context.stroke()
-
-        context.drawImage(
-            player.sprite,
-            player.frame.source_x,
-            player.frame.source_y,
-            player.frame.source_width,
-            player.frame.source_height,
-            player.x,
-            player.y,
-            player.width,
-            player.height
-        )
-
         context.beginPath()
         context.rect(
             player.getLeft(),
@@ -497,6 +516,7 @@ window.addEventListener('load', function () {
             player.getBottom() - player.getTop()
         )
         context.stroke()
+        */
     }
 
     //create engine object
