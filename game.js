@@ -248,6 +248,8 @@ window.addEventListener('load', function () {
         this.source_height = source_height
     }
 
+    let vdirection = [];
+    let hdirection = [];
     const Player = function () {
         MovingObject.call(this, 'img/dog.png', 10, 10, 112, 112, 5)
         this.offset_bottom = 0
@@ -307,21 +309,75 @@ window.addEventListener('load', function () {
 
         this.update = function () {
             this.mode = 'loop'
+
+            if (controller.down.active == false) {
+              vdirection.splice(vdirection.indexOf('down'), 1);
+            }
+            if(controller.down.active) {
+              this.moveDown()
+              this.changeAnimation(this.animations['walkdown'], 'loop')
+              if(vdirection.includes('down') == false){
+                vdirection.push('down');
+              }
+            }
+
+            if (controller.up.active == false) {
+              vdirection.splice(vdirection.indexOf('up'), 1);
+            }
             if (controller.up.active) {
-                this.moveUp()
-                this.changeAnimation(this.animations['walkup'], 'loop')
-            } else if (controller.right.active) {
-                this.moveRight()
-                this.changeAnimation(this.animations['walkright'], 'loop')
-            } else if (controller.down.active) {
-                this.moveDown()
-                this.changeAnimation(this.animations['walkdown'], 'loop')
-            } else if (controller.left.active) {
-                this.moveLeft()
-                this.changeAnimation(this.animations['walkleft'], 'loop')
-            } else this.mode = 'pause'
+              this.moveUp()
+              this.changeAnimation(this.animations['walkup'], 'loop')
+              if(vdirection.includes('up') == false){
+                vdirection.push('up');
+              }
+            }
+
+            if (vdirection[0] == 'down') {
+                this.changeAnimation(this.animations['walkdown'], 'loop');
+            }
+            if (vdirection[0] == 'up') {
+                this.changeAnimation(this.animations['walkup'], 'loop');
+            }
+
+
+
+            if (controller.right.active == false) {
+              hdirection.splice(hdirection.indexOf('right'), 1);
+            }
+            if(controller.right.active) {
+              this.moveRight()
+              this.changeAnimation(this.animations['walkright'], 'loop')
+              if(hdirection.includes('right') == false){
+                hdirection.push('right');
+              }
+            }
+
+            if (controller.left.active == false) {
+              hdirection.splice(hdirection.indexOf('left'), 1);
+            }
+            if (controller.left.active) {
+              this.moveLeft()
+              this.changeAnimation(this.animations['walkleft'], 'loop')
+              if(hdirection.includes('left') == false){
+                hdirection.push('left');
+              }
+            }
+
+            if (hdirection[0] == 'right') {
+                this.changeAnimation(this.animations['walkright'], 'loop');
+            }
+            if (hdirection[0] == 'left') {
+                this.changeAnimation(this.animations['walkleft'], 'loop');
+            }
+
+
+
+          }
+          if (vdirection[0] == '' && hdirection[0] = '') {
+            this.mode = 'pause';
+          }
         }
-    }
+
 
     //create player object
     const player = new Player('img/dog.png')
@@ -393,7 +449,7 @@ window.addEventListener('load', function () {
     const enemy = new Enemy()
     //Update animation for every frame
     const update = function () {
-        world.boundary.collide(player)
+        //world.boundary.collide(player)
         //world.doorway.collide(player);
         player.update()
         player.animate()
