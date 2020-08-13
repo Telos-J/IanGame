@@ -4,8 +4,8 @@ window.addEventListener('load', function () {
     const context = canvas.getContext('2d') // For manipulating the canvas object
 
     //Set Logical canvas dimensions != intrinsic canvas size
-    canvas.width = 1034
-    canvas.height = 658
+    canvas.width = 500 //1034
+    canvas.height = 500 //658
 
     //Pixelate Image
     context.imageSmoothingEnabled = false
@@ -248,8 +248,6 @@ window.addEventListener('load', function () {
         this.source_height = source_height
     }
 
-    let vdirection = [];
-    let hdirection = [];
     const Player = function () {
         MovingObject.call(this, 'img/dog.png', 10, 10, 112, 112, 5)
         this.offset_bottom = 0
@@ -307,95 +305,8 @@ window.addEventListener('load', function () {
         this.animation = this.animations['walkdown']
         Animator.call(this, this.animation, 3, 'pause')
 
-        this.update = function () {
-            this.mode = 'loop'
-<<<<<<< HEAD
-
-            if (controller.down.active == false) {
-              vdirection.splice(vdirection.indexOf('down'), 1);
-            }
-            if(controller.down.active) {
-              this.moveDown()
-              this.changeAnimation(this.animations['walkdown'], 'loop')
-              if(vdirection.includes('down') == false){
-                vdirection.push('down');
-              }
-            }
-
-            if (controller.up.active == false) {
-              vdirection.splice(vdirection.indexOf('up'), 1);
-            }
-            if (controller.up.active) {
-              this.moveUp()
-              this.changeAnimation(this.animations['walkup'], 'loop')
-              if(vdirection.includes('up') == false){
-                vdirection.push('up');
-              }
-            }
-
-            if (vdirection[0] == 'down') {
-                this.changeAnimation(this.animations['walkdown'], 'loop');
-            }
-            if (vdirection[0] == 'up') {
-                this.changeAnimation(this.animations['walkup'], 'loop');
-            }
-
-
-
-            if (controller.right.active == false) {
-              hdirection.splice(hdirection.indexOf('right'), 1);
-            }
-            if(controller.right.active) {
-              this.moveRight()
-              this.changeAnimation(this.animations['walkright'], 'loop')
-              if(hdirection.includes('right') == false){
-                hdirection.push('right');
-              }
-            }
-
-            if (controller.left.active == false) {
-              hdirection.splice(hdirection.indexOf('left'), 1);
-            }
-            if (controller.left.active) {
-              this.moveLeft()
-              this.changeAnimation(this.animations['walkleft'], 'loop')
-              if(hdirection.includes('left') == false){
-                hdirection.push('left');
-              }
-            }
-
-            if (hdirection[0] == 'right') {
-                this.changeAnimation(this.animations['walkright'], 'loop');
-            }
-            if (hdirection[0] == 'left') {
-                this.changeAnimation(this.animations['walkleft'], 'loop');
-            }
-
-
-
-          }
-          if (vdirection[0] == '' && hdirection[0] = '') {
-            this.mode = 'pause';
-          }
-        }
-
-=======
-            if (controller.up.active) {
-                this.moveUp()
-                this.changeAnimation(this.animations['walkup'], 'loop')
-            } else if (controller.right.active) {
-                this.moveRight()
-                this.changeAnimation(this.animations['walkright'], 'loop')
-            } else if (controller.down.active) {
-                this.moveDown()
-                this.changeAnimation(this.animations['walkdown'], 'loop')
-            } else if (controller.left.active) {
-                this.moveLeft()
-                this.changeAnimation(this.animations['walkleft'], 'loop')
-            } else this.mode = 'pause'
-        }
+        this.update = function () {}
     }
->>>>>>> parent of 2b2fdfb... add a camera feature
 
     //create player object
     const player = new Player('img/dog.png')
@@ -465,15 +376,96 @@ window.addEventListener('load', function () {
     }
 
     const enemy = new Enemy()
-    //Update animation for every frame
+
+    const Camera = function () {
+        this.x = 0
+        this.y = 0
+        this.width = 500
+        this.height = 500
+        //    canvas.width = 1034 canvas.height = 658
+        this.moveCamera = function (dx, dy) {
+            if (!world.boundary.collide(player)) {
+                this.x += dx
+                this.y += dy
+            }
+        }
+    }
+
+    const camera = new Camera()
+    let vdirection = [];
+    let hdirection = [];
     const update = function () {
-<<<<<<< HEAD
-        //world.boundary.collide(player)
-=======
-        world.boundary.collide(player)
->>>>>>> parent of 2b2fdfb... add a camera feature
-        //world.doorway.collide(player);
+
+
+          if (controller.down.active == false) {
+            vdirection.splice(vdirection.indexOf('down'), 1);
+          }
+          if(controller.down.active) {
+            player.moveDown()
+            player.changeAnimation(player.animations['walkdown'], 'loop')
+            if(vdirection.includes('down') == false){
+              vdirection.push('down');
+            }
+          }
+
+          if (controller.up.active == false) {
+            vdirection.splice(vdirection.indexOf('up'), 1);
+          }
+          if (controller.up.active) {
+            player.moveUp();
+            player.changeAnimation(player.animations['walkup'], 'loop')
+            if(vdirection.includes('up') == false){
+              vdirection.push('up');
+            }
+          }
+
+          if (vdirection[0] == 'down') {
+              player.changeAnimation(player.animations['walkdown'], 'loop');
+          }
+          if (vdirection[0] == 'up') {
+              player.changeAnimation(player.animations['walkup'], 'loop');
+          }
+
+
+
+          if (controller.right.active == false) {
+            hdirection.splice(hdirection.indexOf('right'), 1);
+          }
+          if(controller.right.active) {
+            player.moveRight()
+            player.changeAnimation(player.animations['walkright'], 'loop')
+            camera.moveCamera(player.speed, 0)
+            if(hdirection.includes('right') == false){
+              hdirection.push('right');
+            }
+          }
+
+          if (controller.left.active == false) {
+            hdirection.splice(hdirection.indexOf('left'), 1);
+          }
+          if (controller.left.active) {
+            player.moveLeft()
+            player.changeAnimation(player.animations['walkleft'], 'loop')
+            camera.moveCamera(-player.speed, 0)
+            if(hdirection.includes('left') == false){
+              hdirection.push('left');
+            }
+          }
+
+          if (hdirection[0] == 'right') {
+              player.changeAnimation(player.animations['walkright'], 'loop');
+          }
+          if (hdirection[0] == 'left') {
+              player.changeAnimation(player.animations['walkleft'], 'loop');
+          }
+        }
+        if (vdirection[0] == '' && hdirection[0] == '') {
+          player.mode = 'pause';
+        }
         player.update()
+
+        world.boundary.collide(player)
+        //world.doorway.collide(player);
         player.animate()
         enemy.animate()
         ;[enemy].forEach((object) => {
@@ -488,7 +480,7 @@ window.addEventListener('load', function () {
                     player.setRight(object.getLeft() - 0.1)
             }
         })
-    }
+
 
     //draw image to canvas
 
@@ -507,8 +499,8 @@ window.addEventListener('load', function () {
                             (world.sourceTileHeight + world.borderWidth),
                     world.sourceTileWidth,
                     world.sourceTileHeight,
-                    world.tileWidth * row,
-                    world.tileHeight * column,
+                    world.tileWidth * row - camera.x,
+                    world.tileHeight * column - camera.y,
                     world.tileWidth,
                     world.tileHeight
                 )
@@ -527,8 +519,8 @@ window.addEventListener('load', function () {
                             (world.sourceTileHeight + world.borderWidth),
                     world.sourceTileWidth,
                     world.sourceTileHeight,
-                    world.tileWidth * row,
-                    world.tileHeight * column,
+                    world.tileWidth * row - camera.x,
+                    world.tileHeight * column - camera.y,
                     world.tileWidth,
                     world.tileHeight
                 )
@@ -541,11 +533,25 @@ window.addEventListener('load', function () {
             enemy.frame.source_y,
             enemy.frame.source_width,
             enemy.frame.source_height,
-            enemy.x,
-            enemy.y,
+            enemy.x - camera.x,
+            enemy.y - camera.y,
             enemy.width,
             enemy.height
         )
+
+        context.drawImage(
+            player.sprite,
+            player.frame.source_x,
+            player.frame.source_y,
+            player.frame.source_width,
+            player.frame.source_height,
+            player.x - camera.x,
+            player.y - camera.y,
+            player.width,
+            player.height
+        )
+
+        /*
         context.beginPath()
         context.rect(
             enemy.getLeft(),
@@ -554,19 +560,6 @@ window.addEventListener('load', function () {
             enemy.getBottom() - enemy.getTop()
         )
         context.stroke()
-
-        context.drawImage(
-            player.sprite,
-            player.frame.source_x,
-            player.frame.source_y,
-            player.frame.source_width,
-            player.frame.source_height,
-            player.x,
-            player.y,
-            player.width,
-            player.height
-        )
-
         context.beginPath()
         context.rect(
             player.getLeft(),
@@ -575,6 +568,7 @@ window.addEventListener('load', function () {
             player.getBottom() - player.getTop()
         )
         context.stroke()
+        */
     }
 
     //create engine object
