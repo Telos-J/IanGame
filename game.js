@@ -309,6 +309,7 @@ window.addEventListener('load', function () {
 
         this.update = function () {
             this.mode = 'loop'
+<<<<<<< HEAD
 
             if (controller.down.active == false) {
               vdirection.splice(vdirection.indexOf('down'), 1);
@@ -378,6 +379,23 @@ window.addEventListener('load', function () {
           }
         }
 
+=======
+            if (controller.up.active) {
+                this.moveUp()
+                this.changeAnimation(this.animations['walkup'], 'loop')
+            } else if (controller.right.active) {
+                this.moveRight()
+                this.changeAnimation(this.animations['walkright'], 'loop')
+            } else if (controller.down.active) {
+                this.moveDown()
+                this.changeAnimation(this.animations['walkdown'], 'loop')
+            } else if (controller.left.active) {
+                this.moveLeft()
+                this.changeAnimation(this.animations['walkleft'], 'loop')
+            } else this.mode = 'pause'
+        }
+    }
+>>>>>>> parent of 2b2fdfb... add a camera feature
 
     //create player object
     const player = new Player('img/dog.png')
@@ -449,7 +467,11 @@ window.addEventListener('load', function () {
     const enemy = new Enemy()
     //Update animation for every frame
     const update = function () {
+<<<<<<< HEAD
         //world.boundary.collide(player)
+=======
+        world.boundary.collide(player)
+>>>>>>> parent of 2b2fdfb... add a camera feature
         //world.doorway.collide(player);
         player.update()
         player.animate()
