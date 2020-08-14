@@ -395,7 +395,7 @@ window.addEventListener('load', function () {
     let vdirection = [];
     let hdirection = [];
     const update = function () {
-
+          player.mode = 'loop';
 
           if (controller.down.active == false) {
             vdirection.splice(vdirection.indexOf('down'), 1);
