@@ -27,7 +27,8 @@ window.addEventListener('load', function () {
             this.tileWidth * 2.4,
             this.tileHeight * 2.5
         )
-        //this.doorway = new World.Doorway(this.tileWidth * 0, this.tileWidth * 0, this.tileWidth * 0, this.tileHeight * 0, this.tileWidth * 1, this.tileHeight * 4)
+
+        this.doorway = new World.Doorway(this.tileWidth * 0, this.tileWidth * 0, this.tileWidth * 0, this.tileHeight * 0, this.tileWidth * 1, this.tileHeight * 4)
     }
 
     World.Boundary = function (
@@ -43,19 +44,21 @@ window.addEventListener('load', function () {
 
         this.collide = function (object) {
             let colliding = true
-            if (object.getTop() < this.boundary_y)
-                object.setTop(this.boundary_y)
-            else if (object.getLeft() < this.boundary_x)
-                object.setLeft(this.boundary_x)
-            else if (object.getRight() > this.boundary_x + this.boundary_width)
-                object.setRight(this.boundary_x + this.boundary_width)
-            else if (
-                object.getBottom() >
-                this.boundary_y + this.boundary_height
-            )
-                object.setBottom(this.boundary_y + this.boundary_height)
-            else colliding = false
-
+            if (object.getTop() < this.boundary_y) {
+                  object.setTop(this.boundary_y);
+            }
+            if (object.getLeft() < this.boundary_x) {
+                object.setLeft(this.boundary_x);
+            }
+            if (object.getRight() > this.boundary_x + this.boundary_width) {
+                object.setRight(this.boundary_x + this.boundary_width);
+            }
+            if (object.getBottom() > (this.boundary_y + this.boundary_height)) {
+                object.setBottom(this.boundary_y + this.boundary_height);
+            }
+            if (!(object.getTop() < this.boundary_y) || !(object.getLeft() < this.boundary_x) || !(object.getRight() > this.boundary_x + this.boundary_width) || !(object.getBottom() > (this.boundary_y + this.boundary_height))) {
+              colliding = false;
+            }
             return colliding
         }
     }
@@ -77,27 +80,23 @@ window.addEventListener('load', function () {
 
         this.collide = function (object) {
             let colliding = true
-            if (object.getTop() < this.boundary_y) {
+            if (object.getBottom() < this.boundary_y) {
                 object.setTop(this.destination_y)
                 object.setLeft(this.destination_x)
-            } else if (object.getLeft() < this.boundary_x) {
+            }
+            if (object.getRight() < this.boundary_x) {
                 object.setTop(this.destination_y)
                 object.setLeft(this.destination_x)
-            } else if (
-                object.getRight() >
-                this.boundary_x + this.boundary_width
-            ) {
+            }
+            if (object.getLeft() > (this.boundary_x + this.boundary_width)) {
                 object.setTop(this.destination_y)
                 object.setLeft(this.destination_x)
-            } else if (
-                object.getBottom() >
-                this.boundary_y + this.boundary_height
-            ) {
+            }
+            if (object.getTop() > (this.boundary_y + this.boundary_height)) {
                 object.setTop(this.destination_y)
                 object.setLeft(this.destination_x)
-            } else colliding = false
+            }
 
-            return colliding
         }
     }
     const world = new World('img/tilemaps/beach.png', 112, 112, 94, 94, 5, [
@@ -384,10 +383,15 @@ window.addEventListener('load', function () {
         this.height = 500
         //    canvas.width = 1034 canvas.height = 658
         this.moveCamera = function (dx, dy) {
+
             if (!world.boundary.collide(player)) {
-                this.x += dx
-                this.y += dy
-            }
+              if (player.x > (world.tileWidth * 3) && player.x < (world.tileWidth * 8)) {
+                this.x += dx;
+              }
+              if (player.y > (world.tileHeight * 3) && player.y < (world.tileHeight * 4)) {
+                this.y += dy;
+              }
+           }
         }
     }
 
@@ -395,7 +399,7 @@ window.addEventListener('load', function () {
     let vdirection = [];
     let hdirection = [];
     const update = function () {
-          player.mode = 'loop';
+
 
           if (controller.down.active == false) {
             vdirection.splice(vdirection.indexOf('down'), 1);
@@ -403,6 +407,7 @@ window.addEventListener('load', function () {
           if(controller.down.active) {
             player.moveDown()
             player.changeAnimation(player.animations['walkdown'], 'loop')
+            camera.moveCamera(0, player.speed);
             if(vdirection.includes('down') == false){
               vdirection.push('down');
             }
@@ -414,6 +419,7 @@ window.addEventListener('load', function () {
           if (controller.up.active) {
             player.moveUp();
             player.changeAnimation(player.animations['walkup'], 'loop')
+            camera.moveCamera(0, -player.speed);
             if(vdirection.includes('up') == false){
               vdirection.push('up');
             }
@@ -465,18 +471,18 @@ window.addEventListener('load', function () {
         player.update()
 
         world.boundary.collide(player)
-        //world.doorway.collide(player);
+        world.doorway.collide(player);
         player.animate()
         enemy.animate()
         ;[enemy].forEach((object) => {
             if (player.collideObject(object)) {
                 if (player.direction == 'up')
                     player.setTop(object.getBottom() + 0.1)
-                else if (player.direction == 'down')
+                if (player.direction == 'down')
                     player.setBottom(object.getTop() - 0.1)
-                else if (player.direction == 'left')
+                if (player.direction == 'left')
                     player.setLeft(object.getRight() + 0.1)
-                else if (player.direction == 'right')
+                if (player.direction == 'right')
                     player.setRight(object.getLeft() - 0.1)
             }
         })
