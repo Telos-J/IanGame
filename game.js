@@ -28,7 +28,13 @@ window.addEventListener('load', function () {
             this.tileHeight * 2.5
         )
 
-        this.doorway = new World.Doorway(this.tileWidth * 0, this.tileWidth * 0, this.tileWidth * 0, this.tileHeight * 0, this.tileWidth * 1, this.tileHeight * 4)
+        this.doorway = new World.Doorway(
+          this.tileWidth * 1,
+          this.tileHeight * 5,
+          this.tileWidth,
+          this.tileHeight,
+          this.tileWidth * 0,
+          this.tileHeight * 0)
     }
 
     World.Boundary = function (
@@ -79,7 +85,7 @@ window.addEventListener('load', function () {
         this.destination_y = destination_y
 
         this.collide = function (object) {
-            let colliding = true
+          let dcolliding = true;
             if (object.getBottom() < this.boundary_y) {
                 object.setTop(this.destination_y)
                 object.setLeft(this.destination_x)
@@ -96,7 +102,10 @@ window.addEventListener('load', function () {
                 object.setTop(this.destination_y)
                 object.setLeft(this.destination_x)
             }
-
+            if (!(object.getTop() < this.boundary_y) || !(object.getLeft() < this.boundary_x) || !(object.getRight() > this.boundary_x + this.boundary_width) || !(object.getBottom() > (this.boundary_y + this.boundary_height))) {
+              dcolliding = false;
+            }
+          console.log(dcolliding);
         }
     }
     const world = new World('img/tilemaps/beach.png', 112, 112, 94, 94, 5, [
@@ -106,7 +115,9 @@ window.addEventListener('load', function () {
         ['AD', 'HN', 'CD', 'AN', 'AI', 'GN', 'GN', 'DI', 'AP', 'BP', 'CI'],
         ['AN', 'AN', 'AN', 'AN', 'AH', 'DN', 'DN', 'AK', 'FG', 'GG', 'BK'],
         ['AN', 'BN', 'AN', 'AN', 'AM', 'AF', 'BF', 'CF', 'DF', 'AF', 'BF'],
-        ['AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN'],
+        ['CN', 'AN', 'AN', 'CN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN'],
+        ['AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'BN', 'AN', 'AN'],
+        ['AN', 'AN', 'AN', 'BN', 'AN', 'AN', 'CN', 'AN', 'AN', 'AN', 'AN']
     ])
 
     const Animator = function (animation, delay, mode = 'loop') {
@@ -172,7 +183,7 @@ window.addEventListener('load', function () {
         this.getTop = function () {
             return this.y + this.offset_top
         }
-        this.getLeft = function () {
+        this.getLeft = function ( ) {
             return this.x + this.offset_left
         }
         this.getRight = function () {
@@ -383,23 +394,21 @@ window.addEventListener('load', function () {
         this.height = 500
         //    canvas.width = 1034 canvas.height = 658
         this.moveCamera = function (dx, dy) {
-
-            if (!world.boundary.collide(player)) {
-              if (player.x > (world.tileWidth * 3) && player.x < (world.tileWidth * 8)) {
-                this.x += dx;
-              }
-              if (player.y > (world.tileHeight * 3) && player.y < (world.tileHeight * 4)) {
-                this.y += dy;
-              }
-           }
+          if (player.x > (world.map[0].length * world.tileWidth * 0.25) && player.x < (world.map[0].length * world.tileWidth * 0.75)) {
+            this.x += dx;
+          }
+          if (player.y > (world.map.length * world.tileHeight * 0.25) && player.y < (world.map.length * world.tileHeight * 0.6)) {
+            this.y += dy;
+          }
         }
     }
 
     const camera = new Camera()
     let vdirection = [];
     let hdirection = [];
+    let pause = false;
     const update = function () {
-
+        player.mode = 'loop'
 
           if (controller.down.active == false) {
             vdirection.splice(vdirection.indexOf('down'), 1);
@@ -464,13 +473,12 @@ window.addEventListener('load', function () {
           if (hdirection[0] == 'left') {
               player.changeAnimation(player.animations['walkleft'], 'loop');
           }
+          player.update();
         }
-        if (vdirection[0] == '' && hdirection[0] == '') {
-          player.mode = 'pause';
-        }
-        player.update()
 
-        world.boundary.collide(player)
+
+
+        //world.boundary.collide(player)
         world.doorway.collide(player);
         player.animate()
         enemy.animate()
