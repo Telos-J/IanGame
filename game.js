@@ -30,11 +30,11 @@ window.addEventListener('load', function () {
 
         this.doorway = new World.Doorway(
           this.tileWidth * 1,
-          this.tileHeight * 5,
+          this.tileHeight * 0,
           this.tileWidth,
           this.tileHeight,
-          this.tileWidth * 0,
-          this.tileHeight * 0)
+          this.tileWidth * 1,
+          this.tileHeight * 3)
     }
 
     World.Boundary = function (
@@ -68,57 +68,6 @@ window.addEventListener('load', function () {
             return colliding
         }
     }
-
-    World.Doorway = function (
-        boundary_x,
-        boundary_y,
-        boundary_width,
-        boundary_height,
-        destination_x,
-        destination_y
-    ) {
-        this.boundary_x = boundary_x
-        this.boundary_y = boundary_y
-        this.boundary_height = boundary_height
-        this.boundary_width = boundary_width
-        this.destination_x = destination_x
-        this.destination_y = destination_y
-
-        this.collide = function (object) {
-          let dcolliding = true;
-            if (object.getBottom() < this.boundary_y) {
-                object.setTop(this.destination_y)
-                object.setLeft(this.destination_x)
-            }
-            if (object.getRight() < this.boundary_x) {
-                object.setTop(this.destination_y)
-                object.setLeft(this.destination_x)
-            }
-            if (object.getLeft() > (this.boundary_x + this.boundary_width)) {
-                object.setTop(this.destination_y)
-                object.setLeft(this.destination_x)
-            }
-            if (object.getTop() > (this.boundary_y + this.boundary_height)) {
-                object.setTop(this.destination_y)
-                object.setLeft(this.destination_x)
-            }
-            if (!(object.getTop() < this.boundary_y) || !(object.getLeft() < this.boundary_x) || !(object.getRight() > this.boundary_x + this.boundary_width) || !(object.getBottom() > (this.boundary_y + this.boundary_height))) {
-              dcolliding = false;
-            }
-          console.log(dcolliding);
-        }
-    }
-    const world = new World('img/tilemaps/beach.png', 112, 112, 94, 94, 5, [
-        ['AA', 'CO', 'CA', 'AN', 'AH', 'DN', 'DN', 'DN', 'DN', 'DN', 'DN'],
-        ['AB', 'BB', 'CB', 'AN', 'AI', 'EN', 'EN', 'AJ', 'FF', 'FF', 'BJ'],
-        ['AC', 'BC', 'CC', 'CN', 'AH', 'FN', 'FN', 'BI', 'AO', 'BO', 'CI'],
-        ['AD', 'HN', 'CD', 'AN', 'AI', 'GN', 'GN', 'DI', 'AP', 'BP', 'CI'],
-        ['AN', 'AN', 'AN', 'AN', 'AH', 'DN', 'DN', 'AK', 'FG', 'GG', 'BK'],
-        ['AN', 'BN', 'AN', 'AN', 'AM', 'AF', 'BF', 'CF', 'DF', 'AF', 'BF'],
-        ['CN', 'AN', 'AN', 'CN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN'],
-        ['AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'BN', 'AN', 'AN'],
-        ['AN', 'AN', 'AN', 'BN', 'AN', 'AN', 'CN', 'AN', 'AN', 'AN', 'AN']
-    ])
 
     const Animator = function (animation, delay, mode = 'loop') {
         this.count = 0
@@ -179,6 +128,10 @@ window.addEventListener('load', function () {
         this.y = y
         this.width = width
         this.height = height
+        this.offset_top = 0
+        this.offset_left = 0
+        this.offset_right = 0
+        this.offset_bottom = 0
 
         this.getTop = function () {
             return this.y + this.offset_top
@@ -216,6 +169,31 @@ window.addEventListener('load', function () {
             return true
         }
     }
+
+    World.Doorway = function (x,y,width, height, destination_x, destination_y) {
+      Object.call(this, false, x,y, width, height)
+      this.destination_x = destination_x
+      this.destination_y = destination_y
+
+      this.teleport = function(object) {
+          object.x = this.destination_x;
+          object.y = this.destination_y
+      }
+    }
+
+
+        const world = new World('img/tilemaps/beach.png', 112, 112, 94, 94, 5, [
+            ['AA', 'CO', 'CA', 'AN', 'AH', 'DN', 'DN', 'DN', 'DN', 'DN', 'DN'],
+            ['AB', 'BB', 'CB', 'AN', 'AI', 'EN', 'EN', 'AJ', 'FF', 'FF', 'BJ'],
+            ['AC', 'BC', 'CC', 'CN', 'AH', 'FN', 'FN', 'BI', 'AO', 'BO', 'CI'],
+            ['AD', 'HN', 'CD', 'AN', 'AI', 'GN', 'GN', 'DI', 'AP', 'BP', 'CI'],
+            ['AN', 'AN', 'AN', 'AN', 'AH', 'DN', 'DN', 'AK', 'FG', 'GG', 'BK'],
+            ['AN', 'BN', 'AN', 'AN', 'AM', 'AF', 'BF', 'CF', 'DF', 'AF', 'BF'],
+            ['CN', 'AN', 'AN', 'CN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN'],
+            ['AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'AN', 'BN', 'AN', 'AN'],
+            ['AN', 'AN', 'AN', 'BN', 'AN', 'AN', 'CN', 'AN', 'AN', 'AN', 'AN']
+        ])
+
 
     const MovingObject = function (
         url,
@@ -259,7 +237,7 @@ window.addEventListener('load', function () {
     }
 
     const Player = function () {
-        MovingObject.call(this, 'img/dog.png', 10, 10, 112, 112, 5)
+        MovingObject.call(this, 'img/dog.png', 10, 100, 112, 112, 5)
         this.offset_bottom = 0
         this.offset_left = 20
         this.offset_right = 20
@@ -321,8 +299,8 @@ window.addEventListener('load', function () {
     //create player object
     const player = new Player('img/dog.png')
 
-    const Enemy = function () {
-        MovingObject.call(this, 'img/cats/cat.png', 10, 10, 112, 112, 5)
+    const SlidingCat = function () {
+        MovingObject.call(this, 'img/cats/cat.png', 100, 100, 112, 112, 3)
         this.offset_bottom = 5
         this.offset_left = 30
         this.offset_right = 30
@@ -383,9 +361,42 @@ window.addEventListener('load', function () {
         }
         this.animation = this.animations['yawn']
         Animator.call(this, this.animation, 7, 'loop')
+
+        this.state = 'follow'
+
+        this.update = function () {
+          switch (this.state) {
+            case 'follow':
+              if (player.getBottom() > this.getTop()) {
+                if(this.animation != this.animations['walkright'] && this.animation != this.animations['walkleft'])
+                this.changeAnimation(this.animations['walkdown'], 'loop')
+                this.moveDown();
+              }
+              if (player.getTop() < this.getBottom()) {
+                if(this.animation != this.animations['walkright'] && this.animation != this.animations['walkleft'])
+                this.changeAnimation(this.animations['walkup'], 'loop')
+                this.moveUp();
+              }
+              if (player.getLeft() > this.getRight()) {
+
+                this.changeAnimation(this.animations['walkright'], 'loop')
+                this.moveRight();
+              }
+              if (player.getRight() < this.getLeft()) {
+                this.changeAnimation(this.animations['walkleft'], 'loop')
+                this.moveLeft();
+              }
+
+              break;
+            case 'slide':
+
+              break;
+
+          }
+        }
     }
 
-    const enemy = new Enemy()
+    const enemy = new SlidingCat()
 
     const Camera = function () {
         this.x = 0
@@ -401,101 +412,123 @@ window.addEventListener('load', function () {
             this.y += dy;
           }
         }
+        this.repositionCamera = function () {
+          if (player.x > (world.map[0].length * world.tileWidth * 0.25) && player.x < (world.map[0].length * world.tileWidth * 0.75)) {
+            this.x = player.x;
+          }
+          if (player.y < (world.map.length * world.tileHeight * 0.25)) {
+            this.y += (world.map.length * world.tileHeight * 0.25 - player.y);
+          }
+          if (player.y > (world.map.length * world.tileHeight * 0.6)) {
+            this.y -= (player.y - world.map.length * world.tileHeight * 0.6);}
+        }
     }
 
     const camera = new Camera()
     let vdirection = [];
     let hdirection = [];
-    let pause = false;
+    //let pause = false;
     const update = function () {
-        player.mode = 'loop'
-
-          if (controller.down.active == false) {
-            vdirection.splice(vdirection.indexOf('down'), 1);
-          }
-          if(controller.down.active) {
-            player.moveDown()
-            player.changeAnimation(player.animations['walkdown'], 'loop')
-            camera.moveCamera(0, player.speed);
-            if(vdirection.includes('down') == false){
-              vdirection.push('down');
-            }
-          }
-
-          if (controller.up.active == false) {
-            vdirection.splice(vdirection.indexOf('up'), 1);
-          }
-          if (controller.up.active) {
-            player.moveUp();
-            player.changeAnimation(player.animations['walkup'], 'loop')
-            camera.moveCamera(0, -player.speed);
-            if(vdirection.includes('up') == false){
-              vdirection.push('up');
-            }
-          }
-
-          if (vdirection[0] == 'down') {
-              player.changeAnimation(player.animations['walkdown'], 'loop');
-          }
-          if (vdirection[0] == 'up') {
-              player.changeAnimation(player.animations['walkup'], 'loop');
-          }
-
-
-
-          if (controller.right.active == false) {
-            hdirection.splice(hdirection.indexOf('right'), 1);
-          }
-          if(controller.right.active) {
-            player.moveRight()
-            player.changeAnimation(player.animations['walkright'], 'loop')
-            camera.moveCamera(player.speed, 0)
-            if(hdirection.includes('right') == false){
-              hdirection.push('right');
-            }
-          }
-
-          if (controller.left.active == false) {
-            hdirection.splice(hdirection.indexOf('left'), 1);
-          }
-          if (controller.left.active) {
-            player.moveLeft()
-            player.changeAnimation(player.animations['walkleft'], 'loop')
-            camera.moveCamera(-player.speed, 0)
-            if(hdirection.includes('left') == false){
-              hdirection.push('left');
-            }
-          }
-
-          if (hdirection[0] == 'right') {
-              player.changeAnimation(player.animations['walkright'], 'loop');
-          }
-          if (hdirection[0] == 'left') {
-              player.changeAnimation(player.animations['walkleft'], 'loop');
-          }
-          player.update();
+      enemy.update();
+      player.mode = 'loop'
+      if (controller.down.active == false) {
+        if(vdirection.includes('down')) vdirection.splice(vdirection.indexOf('down'), 1);
+      }
+      if (controller.down.active) {
+        if(!hdirection.includes('right') && !hdirection.includes('left')) player.changeAnimation(player.animations['walkdown'], 'loop');
+        player.moveDown();
+        camera.moveCamera(0, player.speed);
+        if (vdirection.includes('down') == false) {
+          vdirection.push('down');
         }
+      }
+      if (controller.up.active == false) {
+        if(vdirection.includes('up'))
+        vdirection.splice(vdirection.indexOf('up'), 1);
+      }
+      if (controller.up.active) {
+        if (!hdirection.includes('right') && !hdirection.includes('left')) player.changeAnimation(player.animations['walkup'], 'loop');
+        player.moveUp();
+        camera.moveCamera(0, -player.speed);
+        if (vdirection.includes('up') == false) {
+          vdirection.push('up');
+        }
+      }
+      if (controller.right.active == false) {
+        if(hdirection.includes('right'))
+
+        hdirection.splice(hdirection.indexOf('right'), 1);
+      }
+      if (controller.right.active) {
+        player.changeAnimation(player.animations['walkright'], 'loop');
+        player.moveRight();
+        camera.moveCamera(player.speed, 0);
+        if (hdirection.includes('right') == false) {
+          hdirection.push('right');
+        }
+      }
+      if (controller.left.active == false) {
+        if(hdirection.includes('left'))
+
+        hdirection.splice(hdirection.indexOf('left'), 1);
+      }
+      if (controller.left.active) {
+        player.changeAnimation(player.animations['walkleft'], 'loop');
+        player.moveLeft();
+        camera.moveCamera(-player.speed, 0);
+        if (hdirection.includes('left') == false) {
+          hdirection.push('left');
+        }
+      }
+
+      ////////////////////////
+
+      if(controller.up.active && controller.down.active){
+      if (hdirection[0] == 'up') {
+        player.changeAnimation(player.animations['walkup'], 'loop');
+      }
+      if (vdirection[0] == 'down') {
+        player.changeAnimation(player.animations['walkdown'], 'loop');
+      }
+    }
+    if(controller.left.active && controller.right.active){
+      if (hdirection[0] == 'right') {
+        player.changeAnimation(player.animations['walkright'], 'loop');
+      }
+      if (hdirection[0] == 'left') {
+        player.changeAnimation(player.animations['walkleft'], 'loop');
+      }
+    }
+      if (!(controller.right.active)&& !(controller.left.active) && !(controller.up.active) && !(controller.down.active)) {
+        player.mode = 'pause';
+      }
+          player.update();
+
 
 
 
         //world.boundary.collide(player)
-        world.doorway.collide(player);
+        if(world.doorway.collideObject(player)) {
+          world.doorway.teleport(player);
+          camera.repositionCamera();
+        }
         player.animate()
         enemy.animate()
-        ;[enemy].forEach((object) => {
-            if (player.collideObject(object)) {
-                if (player.direction == 'up')
-                    player.setTop(object.getBottom() + 0.1)
-                if (player.direction == 'down')
-                    player.setBottom(object.getTop() - 0.1)
-                if (player.direction == 'left')
-                    player.setLeft(object.getRight() + 0.1)
-                if (player.direction == 'right')
-                    player.setRight(object.getLeft() - 0.1)
-            }
-        })
+        // ;[enemy].forEach((object) => {
+        //     if (player.collideObject(object)) {
+        //         if (player.direction == 'up')
+        //             player.setTop(object.getBottom() + 0.1)
+        //         if (player.direction == 'down')
+        //             player.setBottom(object.getTop() - 0.1)
+        //         if (player.direction == 'left')
+        //             player.setLeft(object.getRight() + 0.1)
+        //         if (player.direction == 'right')
+        //             player.setRight(object.getLeft() - 0.1)
+        //     }
+        // })
 
-
+        console.log(camera.x, camera.y)
+      }
     //draw image to canvas
 
     const render = function () {
@@ -565,24 +598,31 @@ window.addEventListener('load', function () {
             player.height
         )
 
-        /*
+
         context.beginPath()
         context.rect(
-            enemy.getLeft(),
-            enemy.getTop(),
-            enemy.getRight() - enemy.getLeft(),
-            enemy.getBottom() - enemy.getTop()
+            world.doorway.getLeft() - camera.x,
+            world.doorway.getTop() - camera.y,
+            world.doorway.getRight() - world.doorway.getLeft(),
+            world.doorway.getBottom() - world.doorway.getTop()
         )
         context.stroke()
         context.beginPath()
         context.rect(
-            player.getLeft(),
-            player.getTop(),
+            player.getLeft() - camera.x,
+            player.getTop() - camera.y,
             player.getRight() - player.getLeft(),
             player.getBottom() - player.getTop()
         )
         context.stroke()
-        */
+        context.beginPath()
+        context.rect(
+            enemy.getLeft() - camera.x,
+            enemy.getTop() - camera.y,
+            enemy.getRight() - enemy.getLeft(),
+            enemy.getBottom() - enemy.getTop()
+        )
+        context.stroke()
     }
 
     //create engine object
