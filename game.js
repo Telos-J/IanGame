@@ -57,11 +57,20 @@ window.addEventListener("load", function () {
       if (object.getLeft() < this.boundary_x) {
         object.setLeft(this.boundary_x);
       }
-      if (object.getRight() > this.boundary_x + this.boundary_width) {
-        object.setRight(this.boundary_x + this.boundary_width);
+      if (
+        object.getRight() > this.boundary_x + this.boundary_width &&
+        object.getLeft() < this.boundary_x + this.boundary_width &&
+        object.getTop() > this.boundary_y &&
+        object.getBottom() < this.boundary_y + this.boundary_height
+      ) {
+        console.log('hey')
+        object.setRight(this.boundary_x + this.boundary_width - 0.1);
       }
-      if (object.getBottom() > this.boundary_y + this.boundary_height) {
-        object.setBottom(this.boundary_y + this.boundary_height);
+      if (
+        object.getBottom() > this.boundary_y + this.boundary_height &&
+        object.getTop() < this.boundary_y + this.boundary_height
+      ) {
+        object.setBottom(this.boundary_y + this.boundary_height - 0.1);
       }
       if (
         !(object.getTop() < this.boundary_y) ||
@@ -148,6 +157,12 @@ window.addEventListener("load", function () {
     };
     this.getBottom = function () {
       return this.y + this.height - this.offset_bottom;
+    };
+    this.getCenterX = function () {
+      return (this.getLeft() + this.getRight()) / 2;
+    };
+    this.getCenterY = function () {
+      return (this.getTop() + this.getBottom()) / 2;
     };
     this.setTop = function (top) {
       this.y = top - this.offset_top;
@@ -287,6 +302,7 @@ window.addEventListener("load", function () {
     };
 
     this.animation = this.animations["walkdown"];
+    this.totalHearts = 3;
     Animator.call(this, this.animation, 3, "pause");
 
     this.update = function () {};
@@ -359,7 +375,6 @@ window.addEventListener("load", function () {
     Animator.call(this, this.animation, 7, "loop");
 
     this.state = "follow";
-    this.count = 0;
 
     this.update = function () {
       console.log(this.pounceBegin, this.countPounce);
@@ -405,42 +420,31 @@ window.addEventListener("load", function () {
           }
           break;
         case "slide":
-          if (player.)
-          /*
-              if (player.getTop() > this.getBottom()) {
-                this.changeAnimation(this.animations['pouncedown'], 'loop')
-                this.pounceBegin -= 1;
-                if (this.pounceBegin <= 0) {
-                  this.countPounce++
-                  if(this.countPounce < 8) {
-                        this.y += (player.y - this.y) / 8;
-                  }
-                }
-                if (this.countPounce >= 8) {
-                  this.countPounce = 0;
-                  this.pounceBegin = 30;
-                }
-              }
+          this.pounceBegin -= 1;
+          if (this.pounceBegin <= 0) {
+            this.countPounce++;
+            if (this.countPounce < 8) {
+              this.y += (player.y - this.y) / 8;
+              this.x += (player.x - this.x) / 8;
+            }
+          }
+          if (this.countPounce >= 8) {
+            this.countPounce = 0;
+            this.pounceBegin = 30;
+          }
 
+          let x = player.getCenterX() - enemy.getCenterX();
+          let y = enemy.getCenterY() - player.getCenterY();
 
-
-
-
-              if (player.getBottom() < this.getTop()) {
-                this.changeAnimation(this.animations['pounceup'], 'loop')
-                this.pounceBegin -= 1;
-                if (this.pounceBegin <= 0) {
-                  this.countPounce++
-                  if(this.countPounce < 8) {
-                        this.y -= (player.y + this.y) / 8;
-                  }
-                }
-                if (this.countPounce >= 8) {
-                  this.countPounce = 0;
-                  this.pounceBegin = 30;
-                }
-              }
-              */
+          if (y < x && y < -x) {
+            this.changeAnimation(this.animations["pouncedown"], "loop");
+          } else if (y > x && y > -x) {
+            this.changeAnimation(this.animations["pounceup"], "loop");
+          } else if (y < x && y > -x) {
+            this.changeAnimation(this.animations["pounceright"], "loop");
+          } else if (y > x && y < -x) {
+            this.changeAnimation(this.animations["pounceleft"], "loop");
+          }
 
           if (
             !(
@@ -459,6 +463,9 @@ window.addEventListener("load", function () {
   };
 
   const enemy = new SlidingCat();
+
+  const heart = new Object("img/heart.png", 0, 0, 25, 25);
+  heart.frame = new Frame(0, 0, 254, 254);
 
   const Camera = function () {
     this.x = 0;
@@ -500,6 +507,7 @@ window.addEventListener("load", function () {
   const camera = new Camera();
   let vdirection = [];
   let hdirection = [];
+  let damageCooldown = 0;
   //let pause = false;
   const update = function () {
     enemy.update();
@@ -583,26 +591,25 @@ window.addEventListener("load", function () {
     }
     player.update();
 
-    //world.boundary.collide(player)
     if (world.doorway.collideObject(player)) {
       world.doorway.teleport(player);
       camera.repositionCamera();
     }
     player.animate();
     enemy.animate();
-    // ;[enemy].forEach((object) => {
-    //     if (player.collideObject(object)) {
-    //         if (player.direction == 'up')
-    //             player.setTop(object.getBottom() + 0.1)
-    //         if (player.direction == 'down')
-    //             player.setBottom(object.getTop() - 0.1)
-    //         if (player.direction == 'left')
-    //             player.setLeft(object.getRight() + 0.1)
-    //         if (player.direction == 'right')
-    //             player.setRight(object.getLeft() - 0.1)
-    //     }
-    // })
+    [enemy].forEach((object) => {
+      if (player.collideObject(object) && damageCooldown == 0) {
+        player.totalHearts -= 1;
+        damageCooldown = 30;
+      }
+    });
+    damageCooldown--;
+    if (damageCooldown <= 0) {
+      damageCooldown = 0;
+    }
 
+    world.boundary.collide(player);
+    world.boundary.collide(enemy);
     //console.log(camera.x, camera.y)
   };
   //draw image to canvas
@@ -673,6 +680,20 @@ window.addEventListener("load", function () {
       player.width,
       player.height
     );
+
+    for (numHearts = 0; numHearts < player.totalHearts; numHearts++) {
+      context.drawImage(
+        heart.sprite,
+        heart.frame.source_x,
+        heart.frame.source_y,
+        heart.frame.source_width,
+        heart.frame.source_height,
+        heart.x + heart.width * numHearts,
+        heart.y,
+        heart.width,
+        heart.height
+      );
+    }
 
     context.strokeStyle = "#000000";
     context.beginPath();
