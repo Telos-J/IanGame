@@ -354,15 +354,24 @@ window.addEventListener('load', function () {
                 new Frame(32 * 0, 32 * 7, 32, 32),
                 new Frame(32 * 1, 32 * 7, 32, 32),
             ],
-            pounce: [
+            pounceright: [
                 new Frame(32 * 2, 32 * 7, 32, 32),
+            ],
+            pounceleft: [
                 new Frame(32 * 3, 32 * 7, 32, 32),
             ],
+            pouncedown: [
+                new Frame(32 * 0, 32 * 4, 32, 32),
+            ],
+            pounceup: [
+                new Frame(32 * 2, 32 * 2, 32, 32),
+            ]
         }
         this.animation = this.animations['yawn']
         Animator.call(this, this.animation, 7, 'loop')
 
         this.state = 'follow'
+
 
         this.update = function () {
           switch (this.state) {
@@ -387,9 +396,37 @@ window.addEventListener('load', function () {
                 this.moveLeft();
               }
 
+              if ((player.x <= this.getRight() + world.tileWidth) && !(player.x < this.getLeft() - world.tileWidth)) {
+                  console.log('pouncereadyS');
+              }
+
               break;
             case 'slide':
-
+              if (player.getBottom() > this.getTop()) {
+                this.changeAnimation(this.animations['pounceup'], 'loop')
+                for (var i = 0; i < 4; i++) {
+                  this.y -= 0.5
+                }
+              }
+              if (player.getTop() < this.getBottom()) {
+                this.changeAnimation(this.animations['walkdown'], 'loop')
+                for (var i = 0; i < 4; i++) {
+                  this.y += 0.5
+                }
+              }
+              if (player.getLeft() > this.getRight()) {
+                this.changeAnimation(this.animations['walkright'], 'loop')
+                for (var i = 0; i < 4; i++) {
+                  this.x +=  0.5
+                }
+              }
+              if (player.getRight() < this.getLeft()) {
+                this.changeAnimation(this.animations['walkleft'], 'loop')
+                for (var i = 0; i < 4; i++) {
+                  this.x -=  0.5
+                }
+              }
+              this.state = 'follow';
               break;
 
           }
@@ -527,7 +564,7 @@ window.addEventListener('load', function () {
         //     }
         // })
 
-        console.log(camera.x, camera.y)
+        //console.log(camera.x, camera.y)
       }
     //draw image to canvas
 
