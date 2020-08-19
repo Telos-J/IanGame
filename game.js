@@ -448,16 +448,21 @@ window.addEventListener('load', function () {
           if (player.y > (world.map.length * world.tileHeight * 0.25) && player.y < (world.map.length * world.tileHeight * 0.6)) {
             this.y += dy;
           }
+          this.repositionCamera()
         }
         this.repositionCamera = function () {
-          if (player.x > (world.map[0].length * world.tileWidth * 0.25) && player.x < (world.map[0].length * world.tileWidth * 0.75)) {
-            this.x = player.x;
+          if (this.y < 0) {
+            this.y = 0
           }
-          if (player.y < (world.map.length * world.tileHeight * 0.25)) {
-            this.y += (world.map.length * world.tileHeight * 0.25 - player.y);
+          if (this.y > world.map.length * world.tileHeight) {
+          this.y = world.map.length * world.tileHeight;
+        }
+          if (this.x < 0) {
+            this.x = 0;
           }
-          if (player.y > (world.map.length * world.tileHeight * 0.6)) {
-            this.y -= (player.y - world.map.length * world.tileHeight * 0.6);}
+          if (this.x > world.map[0].length * world.tileWidth) {
+            this.x = world.map[0].length * world.tileWidth;
+          }
         }
     }
 
@@ -564,7 +569,7 @@ window.addEventListener('load', function () {
         //     }
         // })
 
-        //console.log(camera.x, camera.y)
+        console.log(camera.x, camera.y)
       }
     //draw image to canvas
 
