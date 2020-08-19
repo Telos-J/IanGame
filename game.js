@@ -396,7 +396,7 @@ window.addEventListener('load', function () {
                 this.moveLeft();
               }
 
-              if ((player.x <= this.getRight() + world.tileWidth) && !(player.x <= this.getLeft() - world.tileWidth)) {
+              if ((player.x <= this.getRight() + world.tileWidth) && !(player.x <= this.getLeft() - world.tileWidth) && !(player.y <= this.getBottom() + world.tileHeight) && (player.y <= this.getTop() - world.TileHeight)) {
                   console.log('pouncereadyS');
               }
 
