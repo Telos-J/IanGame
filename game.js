@@ -27,6 +27,12 @@ window.addEventListener('load', function () {
             this.tileWidth * 2.4,
             this.tileHeight * 2.5
         )
+        this.hillboundary = new World.Boundary(
+            this.tileWidth * 0.3,
+            0,
+            this.tileWidth * 2.4,
+            this.tileHeight * 4
+        )
 
         this.worldboundary = new World.Boundary(
             0,
@@ -41,7 +47,7 @@ window.addEventListener('load', function () {
             this.tileWidth,
             this.tileHeight,
             this.tileWidth * 1,
-            this.tileHeight * 3
+            this.tileHeight * 3.6
         )
     }
 
@@ -58,27 +64,65 @@ window.addEventListener('load', function () {
 
         this.collide = function (object) {
             let colliding = true
-            if (object.getTop() < this.boundary_y) {
+            if (
+                object.getLeftSafety() > this.boundary_x &&
+                object.getRightSafety() <
+                    this.boundary_x + this.boundary_width &&
+                object.getTop() < this.boundary_y &&
+                object.getPrevTop() >= this.boundary_y
+            ) {
                 object.setTop(this.boundary_y)
             }
-            if (object.getLeft() < this.boundary_x) {
+            if (
+                object.getLeft() < this.boundary_x &&
+                object.getPrevLeft() >= this.boundary_x &&
+                object.getBottomSafety() <=
+                    this.boundary_y + this.boundary_height &&
+                object.getTopSafety() >= boundary_y
+            ) {
                 object.setLeft(this.boundary_x)
             }
             if (
                 object.getRight() > this.boundary_x + this.boundary_width &&
-                object.getLeft() < this.boundary_x + this.boundary_width &&
-                object.getBottom() - object.speed <=
+                object.getPrevRight() <=
+                    this.boundary_x + this.boundary_width &&
+                object.getBottomSafety() <=
                     this.boundary_y + this.boundary_height &&
-                object.getTop() + object.speed >= this.boundary_y
+                object.getTopSafety() >= this.boundary_y
             ) {
                 object.setRight(this.boundary_x + this.boundary_width)
             }
             if (
+                object.getLeft() < this.boundary_x + this.boundary_width &&
+                object.getPrevLeft() >= this.boundary_x + this.boundary_width &&
+                object.getTopSafety() <=
+                    this.boundary_y + this.boundary_height &&
+                object.getBottomSafety() >= this.boundary_y
+            ) {
+                object.setLeft(this.boundary_x + this.boundary_width)
+            }
+
+            if (
+                object.getLeftSafety() > this.boundary_x &&
+                object.getRightSafety() <
+                    this.boundary_x + this.boundary_width &&
                 object.getBottom() > this.boundary_y + this.boundary_height &&
-                object.getTop() < this.boundary_y + this.boundary_height
+                object.getTop() < this.boundary_y + this.boundary_height &&
+                object.getPrevBottom() <= this.boundary_y + this.boundary_height
             ) {
                 object.setBottom(this.boundary_y + this.boundary_height)
             }
+            if (
+                object.getRightSafety() > this.boundary_x &&
+                object.getLeftSafety() <
+                    this.boundary_x + this.boundary_width &&
+                object.getTop() < this.boundary_y + this.boundary_height &&
+                object.getBottom() > this.boundary_y + this.boundary_height &&
+                object.getPrevTop() >= this.boundary_y + this.boundary_height
+            ) {
+                object.setTop(this.boundary_y + this.boundary_height)
+            }
+
             if (
                 !(object.getTop() < this.boundary_y) ||
                 !(object.getLeft() < this.boundary_x) ||
@@ -173,6 +217,25 @@ window.addEventListener('load', function () {
         this.getCenterY = function () {
             return (this.getTop() + this.getBottom()) / 2
         }
+        this.getPrevTop = function () {
+            return this.prevY + this.offset_top
+        }
+        this.getPrevLeft = function () {
+            return this.prevX + this.offset_left
+        }
+        this.getPrevRight = function () {
+            return this.prevX + this.width - this.offset_right
+        }
+        this.getPrevBottom = function () {
+            return this.prevY + this.height - this.offset_bottom
+        }
+        this.getPrevCenterX = function () {
+            return (this.getPrevLeft() + this.getPrevRight()) / 2
+        }
+        this.getPrevCenterY = function () {
+            return (this.getPrevTop() + this.getPrevBottom()) / 2
+        }
+
         this.setTop = function (top) {
             this.y = top - this.offset_top
         }
@@ -238,6 +301,8 @@ window.addEventListener('load', function () {
         direction = 'up'
     ) {
         Object.call(this, url, x, y, width, height)
+        this.prevX = x
+        this.prevY = y
         this.speed = speed
         this.direction = direction
 
@@ -259,6 +324,37 @@ window.addEventListener('load', function () {
         this.moveLeft = function () {
             this.direction = 'left'
             this.x -= this.speed
+        }
+
+        this.getTopSafety = function () {
+            return this.getTop() + this.speed
+        }
+
+        this.getLeftSafety = function () {
+            return this.getLeft() + this.speed
+        }
+
+        this.getRightSafety = function () {
+            return this.getRight() - this.speed
+        }
+
+        this.getBottomSafety = function () {
+            return this.getBottom() - this.speed
+        }
+        this.getPrevTopSafety = function () {
+            return this.getPrevTop() + this.speed
+        }
+
+        this.getPrevLeftSafety = function () {
+            return this.getPrevLeft() + this.speed
+        }
+
+        this.getPrevRightSafety = function () {
+            return this.getPrevRight() - this.speed
+        }
+
+        this.getPrevBottomSafety = function () {
+            return this.getPrevBottom() - this.speed
         }
     }
 
@@ -339,6 +435,9 @@ window.addEventListener('load', function () {
         this.offset_left = 30
         this.offset_right = 30
         this.offset_top = 45
+        this.walkSpeed = 3
+        this.pounceSpeed = 15
+        this.maxSteps = 20
 
         this.animations = {
             walkdown: [
@@ -445,23 +544,20 @@ window.addEventListener('load', function () {
                         player.getLeft() < enemy.getRight() + world.tileWidth &&
                         player.getTop() < enemy.getBottom() + world.tileHeight
                     ) {
-                        this.state = 'slide'
-                        this.countPounce = 0
-                        this.pounceBegin = 1 * 30
+                        this.state = 'slideready'
+                        this.pounceBegin = 30
                     }
                     break
-                case 'slide':
+                case 'slideready':
                     this.pounceBegin -= 1
                     if (this.pounceBegin <= 0) {
-                        this.countPounce++
-                        if (this.countPounce < 8) {
-                            this.y += (player.y - this.y) / 8
-                            this.x += (player.x - this.x) / 8
-                        }
-                    }
-                    if (this.countPounce >= 8) {
+                        this.dist = Math.hypot(
+                            player.y - this.y,
+                            player.x - this.x
+                        )
+                        this.state = 'slide'
+                        this.speed = this.pounceSpeed
                         this.countPounce = 0
-                        this.pounceBegin = 30
                     }
 
                     let x = player.getCenterX() - enemy.getCenterX()
@@ -501,7 +597,42 @@ window.addEventListener('load', function () {
                                 enemy.getBottom() + world.tileHeight
                         )
                     ) {
+                        this.speed = this.walkSpeed
                         this.state = 'follow'
+                    }
+
+                    break
+
+                case 'slide':
+                    this.countPounce++
+                    if (
+                        this.countPounce <
+                        Math.min(
+                            this.maxSteps,
+                            Math.ceil(this.dist / this.speed)
+                        )
+                    ) {
+                        this.y += ((player.y - this.y) / this.dist) * this.speed
+                        this.x += ((player.x - this.x) / this.dist) * this.speed
+                    } else {
+                        if (
+                            player.getRight() >
+                                enemy.getLeft() - world.tileWidth &&
+                            player.getBottom() >
+                                enemy.getTop() - world.tileHeight &&
+                            player.getLeft() <
+                                enemy.getRight() + world.tileWidth &&
+                            player.getTop() <
+                                enemy.getBottom() + world.tileHeight
+                        ) {
+                            this.state = 'slideready'
+                            this.pounceBegin = 30
+                        } else {
+                            this.speed = this.walkSpeed
+                            this.state = 'follow'
+                            this.countPounce = 0
+                            this.pounceBegin = 30
+                        }
                     }
 
                     break
@@ -564,6 +695,11 @@ window.addEventListener('load', function () {
     let damageCooldown = 0
     //let pause = false;
     const update = function () {
+        enemy.prevX = enemy.x
+        enemy.prevY = enemy.y
+        player.prevX = player.x
+        player.prevY = player.y
+
         enemy.update()
         player.mode = 'loop'
         if (controller.down.active == false) {
@@ -662,14 +798,14 @@ window.addEventListener('load', function () {
             damageCooldown = 0
         }
 
-        ;[world.boundary, world.worldboundary].forEach((boundary) => {
-            ;[player, enemy].forEach((object) => {
-                boundary.collide(object)
-            })
-        })
-        console.log(camera.x, camera.y)
+        ;[world.boundary, world.worldboundary, world.hillboundary].forEach(
+            (boundary) => {
+                ;[player, enemy].forEach((object) => {
+                    boundary.collide(object)
+                })
+            }
+        )
     }
-    //draw image to canvas
 
     const render = function () {
         context.fillStyle = 'white'
