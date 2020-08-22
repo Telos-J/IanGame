@@ -33,6 +33,12 @@ window.addEventListener("load", function () {
       this.tileWidth * 2.4,
       this.tileHeight * 4
     );
+    this.waterboundary = new World.Boundary(
+      this.tileWidth * 4.5,
+      0,
+      this.tileWidth * 8,
+      this.tileHeight * 5.5
+    );
 
     this.worldboundary = new World.Boundary(
       0,
@@ -64,6 +70,7 @@ window.addEventListener("load", function () {
 
     this.collide = function (object) {
       let colliding = true;
+
       if (
         object.getLeftSafety() > this.boundary_x &&
         object.getRightSafety() < this.boundary_x + this.boundary_width &&
@@ -80,6 +87,8 @@ window.addEventListener("load", function () {
       ) {
         object.setLeft(this.boundary_x);
       }
+
+
       if (
         object.getRight() > this.boundary_x + this.boundary_width &&
         object.getPrevRight() <= this.boundary_x + this.boundary_width &&
@@ -115,6 +124,20 @@ window.addEventListener("load", function () {
       ) {
         object.setTop(this.boundary_y + this.boundary_height);
       }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       if (
         !(object.getTop() < this.boundary_y) ||
@@ -408,7 +431,7 @@ window.addEventListener("load", function () {
   const player = new Player("img/dog.png");
 
   const Bullet = function (ex, ey) {
-    MovingObject.call(this, "img/cats/furball.png", ex, ex, 56, 56, 6)
+    MovingObject.call(this, "img/cats/furball.png", ex, ex, 56, 56, 6);
     this.ex = ex;
     this.ey = ey;
     this.speed = 6;
@@ -418,19 +441,19 @@ window.addEventListener("load", function () {
         new Frame(32 * 0, 32 * 0, 32, 32),
         new Frame(32 * 1, 32 * 2, 32, 32),
         new Frame(32 * 2, 32 * 2, 32, 32),
-      ]
+      ],
     };
     this.animation = this.animations["spin"];
     Animator.call(this, this.animation, 7, "loop");
     this.dist = Math.hypot(player.y - this.ey, player.x - this.ex);
     this.update = function () {
-      console.log('hey');
+      console.log("hey");
       this.ex += ((player.y - this.ey) / this.dist) * this.speed;
       this.ex += ((player.x - this.ex) / this.dist) * this.speed;
-    }
-  }
-  const SlidingCat = function () {
-    MovingObject.call(this, "img/cats/cat.png", 100, 100, 112, 112, 3);
+    };
+  };
+  const SlidingCat = function (x, y) {
+    MovingObject.call(this, "img/cats/cat.png", x, y, 112, 112, 3);
     this.offset_bottom = 5;
     this.offset_left = 30;
     this.offset_right = 30;
@@ -601,8 +624,8 @@ window.addEventListener("load", function () {
     };
   };
 
-  const ShootingCat = function () {
-    MovingObject.call(this, "img/cats/cat2.png", 300, 100, 112, 112, 3);
+  const ShootingCat = function (x, y) {
+    MovingObject.call(this, "img/cats/cat2.png", x, y, 112, 112, 3);
     this.offset_bottom = 5;
     this.offset_left = 30;
     this.offset_right = 30;
@@ -706,10 +729,10 @@ window.addEventListener("load", function () {
           }
           break;
         case "shoot":
-        this.mode = 'pause';
-        this.count++;
-        let x2 = player.getCenterX() - this.getCenterX();
-        let y2 = this.getCenterY() - player.getCenterY();
+          this.mode = "pause";
+          this.count++;
+          let x2 = player.getCenterX() - this.getCenterX();
+          let y2 = this.getCenterY() - player.getCenterY();
           if (y2 < x2 && y2 < -x2) {
             this.changeAnimation(this.animations["walkdown"], "pause");
           } else if (y2 > x2 && y2 > -x2) {
@@ -723,22 +746,141 @@ window.addEventListener("load", function () {
             const bullet = new Bullet(this.x, this.y);
             this.count = 0;
           }
-        if (
-          !(player.getRight() > this.getLeft() - 3 * world.tileWidth &&
-          player.getBottom() > this.getTop() - 3 * world.tileHeight &&
-          player.getLeft() < this.getRight() + 3 * world.tileWidth &&
-          player.getTop() < this.getBottom() + 3 * world.tileHeight)
-        ) {
-          this.state = "follow";
-          this.mode = 'loop';
-          this.count = 0;
-        }
+          if (
+            !(
+              player.getRight() > this.getLeft() - 3 * world.tileWidth &&
+              player.getBottom() > this.getTop() - 3 * world.tileHeight &&
+              player.getLeft() < this.getRight() + 3 * world.tileWidth &&
+              player.getTop() < this.getBottom() + 3 * world.tileHeight
+            )
+          ) {
+            this.state = "follow";
+            this.mode = "loop";
+            this.count = 0;
+          }
       }
     };
   };
 
-  const enemy = new SlidingCat();
-  const enemy2 = new ShootingCat();
+  const ChasingCat = function (x, y) {
+    MovingObject.call(this, "img/cats/cat3.png", x, y, 112, 112, 3);
+    this.offset_bottom = 5;
+    this.offset_left = 30;
+    this.offset_right = 30;
+    this.offset_top = 45;
+    this.speed = 4.5;
+    this.restcount = 0;
+
+    this.animations = {
+      walkdown: [
+        new Frame(32 * 0, 32 * 0, 32, 32),
+        new Frame(32 * 1, 32 * 0, 32, 32),
+        new Frame(32 * 2, 32 * 0, 32, 32),
+        new Frame(32 * 3, 32 * 0, 32, 32),
+      ],
+      walkright: [
+        new Frame(32 * 0, 32 * 1, 32, 32),
+        new Frame(32 * 1, 32 * 1, 32, 32),
+        new Frame(32 * 2, 32 * 1, 32, 32),
+        new Frame(32 * 3, 32 * 1, 32, 32),
+      ],
+      walkup: [
+        new Frame(32 * 0, 32 * 2, 32, 32),
+        new Frame(32 * 1, 32 * 2, 32, 32),
+        new Frame(32 * 2, 32 * 2, 32, 32),
+        new Frame(32 * 3, 32 * 2, 32, 32),
+      ],
+      walkleft: [
+        new Frame(32 * 0, 32 * 3, 32, 32),
+        new Frame(32 * 1, 32 * 3, 32, 32),
+        new Frame(32 * 2, 32 * 3, 32, 32),
+        new Frame(32 * 3, 32 * 3, 32, 32),
+      ],
+      sit: [
+        new Frame(32 * 0, 32 * 4, 32, 32),
+        new Frame(32 * 1, 32 * 4, 32, 32),
+        new Frame(32 * 2, 32 * 4, 32, 32),
+        new Frame(32 * 3, 32 * 4, 32, 32),
+      ],
+      sitting: [new Frame(32 * 3, 32 * 4, 32, 32)],
+      yawn: [
+        new Frame(32 * 0, 32 * 5, 32, 32),
+        new Frame(32 * 1, 32 * 5, 32, 32),
+        new Frame(32 * 2, 32 * 5, 32, 32),
+        new Frame(32 * 3, 32 * 5, 32, 32),
+      ],
+      fallright: [
+        new Frame(32 * 0, 32 * 6, 32, 32),
+        new Frame(32 * 1, 32 * 6, 32, 32),
+        new Frame(32 * 2, 32 * 6, 32, 32),
+        new Frame(32 * 3, 32 * 6, 32, 32),
+      ],
+      sleep: [
+        new Frame(32 * 0, 32 * 7, 32, 32),
+        new Frame(32 * 1, 32 * 7, 32, 32),
+      ],
+      pounceright: [new Frame(32 * 2, 32 * 7, 32, 32)],
+      pounceleft: [new Frame(32 * 3, 32 * 7, 32, 32)],
+      pouncedown: [new Frame(32 * 0, 32 * 4, 32, 32)],
+      pounceup: [new Frame(32 * 2, 32 * 2, 32, 32)],
+    };
+    this.animation = this.animations["yawn"];
+    Animator.call(this, this.animation, 7, "loop");
+
+    this.state = "follow";
+
+    this.update = function () {
+      switch (this.state) {
+        case "follow":
+        this.count++;
+          if (player.getBottom() > this.getTop()) {
+            if (
+              this.animation != this.animations["walkright"] &&
+              this.animation != this.animations["walkleft"]
+            )
+              this.changeAnimation(this.animations["walkdown"], "loop");
+            this.moveDown();
+          }
+          if (player.getTop() < this.getBottom()) {
+            if (
+              this.animation != this.animations["walkright"] &&
+              this.animation != this.animations["walkleft"]
+            )
+              this.changeAnimation(this.animations["walkup"], "loop");
+            this.moveUp();
+          }
+          if (player.getLeft() > this.getRight()) {
+            this.changeAnimation(this.animations["walkright"], "loop");
+            this.moveRight();
+          }
+          if (player.getRight() < this.getLeft()) {
+            this.changeAnimation(this.animations["walkleft"], "loop");
+            this.moveLeft();
+          }
+          if (this.count == 120) {
+            this.count = 0;
+            this.state = 'rest';
+          }
+          break;
+
+        case "rest":
+            this.changeAnimation(this.animations["yawn"], "loop");
+
+            this.restcount++;
+
+            if (this.restcount == 180) {
+              this.restcount = 0;
+              this.state = 'follow';
+            }
+          break;
+      }
+    };
+  };
+
+
+  const enemy = new SlidingCat(1000, 100);
+  const enemy2 = new ShootingCat(1000, 100);
+  const enemy3 = new ChasingCat(1000, 100);
 
   const heart = new Object("img/heart.png", 0, 0, 25, 25);
   heart.frame = new Frame(0, 0, 254, 254);
@@ -795,11 +937,14 @@ window.addEventListener("load", function () {
     enemy.prevY = enemy.y;
     enemy2.prevX = enemy2.x;
     enemy2.prevY = enemy2.y;
+    enemy3.prevX = enemy3.x;
+    enemy3.prevY = enemy3.y;
     player.prevX = player.x;
     player.prevY = player.y;
 
     enemy.update();
     enemy2.update();
+    enemy3.update();
     player.mode = "loop";
     if (controller.down.active == false) {
       if (vdirection.includes("down"))
@@ -886,7 +1031,8 @@ window.addEventListener("load", function () {
     }
     player.animate();
     enemy.animate();
-    enemy2.animate();
+    enemy2.update();
+    enemy3.update();
     [enemy].forEach((object) => {
       if (player.collideObject(object) && damageCooldown == 0) {
         player.totalHearts -= 1;
@@ -899,14 +1045,20 @@ window.addEventListener("load", function () {
         damageCooldown = 30;
       }
     });
+    [enemy3].forEach((object) => {
+      if (player.collideObject(object) && damageCooldown == 0) {
+        player.totalHearts -= 1;
+        damageCooldown = 30;
+      }
+    });
     damageCooldown--;
     if (damageCooldown <= 0) {
       damageCooldown = 0;
     }
 
-    [world.boundary, world.worldboundary, world.hillboundary].forEach(
+    [world.boundary, world.worldboundary, world.hillboundary, world.waterboundary].forEach(
       (boundary) => {
-        [player, enemy, enemy2].forEach((object) => {
+        [player, enemy, enemy2, enemy3].forEach((object) => {
           boundary.collide(object);
         });
       }
@@ -981,6 +1133,18 @@ window.addEventListener("load", function () {
     );
 
     context.drawImage(
+      enemy3.sprite,
+      enemy3.frame.source_x,
+      enemy3.frame.source_y,
+      enemy3.frame.source_width,
+      enemy3.frame.source_height,
+      enemy3.x - camera.x,
+      enemy3.y - camera.y,
+      enemy3.width,
+      enemy3.height
+    );
+
+    context.drawImage(
       player.sprite,
       player.frame.source_x,
       player.frame.source_y,
@@ -1038,6 +1202,14 @@ window.addEventListener("load", function () {
       enemy2.getTop() - camera.y,
       enemy2.getRight() - enemy2.getLeft(),
       enemy2.getBottom() - enemy2.getTop()
+    );
+    context.stroke();
+    context.beginPath();
+    context.rect(
+      enemy3.getLeft() - camera.x,
+      enemy3.getTop() - camera.y,
+      enemy3.getRight() - enemy3.getLeft(),
+      enemy3.getBottom() - enemy3.getTop()
     );
     context.stroke();
     context.strokeStyle = "#FF0000";
