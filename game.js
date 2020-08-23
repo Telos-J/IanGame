@@ -36,16 +36,16 @@ window.addEventListener("load", function () {
     this.waterboundary = new World.Boundary(
       this.tileWidth * 4.5,
       0,
-      this.tileWidth * 8,
+      this.tileWidth * 11,
       this.tileHeight * 5.5
     );
 
-    // this.worldboundary = new World.Boundary(
-    //   0,
-    //   0,
-    //   this.map[0].length * this.tileWidth,
-    //   this.map.length * this.tileHeight
-    // );
+    this.worldboundary = new World.Boundary(
+      0,
+      0,
+      this.map[0].length * this.tileWidth,
+      this.map.length * this.tileHeight
+    );
 
     this.doorway = new World.Doorway(
       this.tileWidth * 1,
@@ -71,6 +71,7 @@ window.addEventListener("load", function () {
     this.collide = function (object) {
       let colliding = true;
 
+      // inner top
       if (
         object.getLeftSafety() > this.boundary_x &&
         object.getRightSafety() < this.boundary_x + this.boundary_width &&
@@ -79,16 +80,16 @@ window.addEventListener("load", function () {
       ) {
         object.setTop(this.boundary_y);
       }
+      // inner left
       if (
         object.getLeft() < this.boundary_x &&
         object.getPrevLeft() >= this.boundary_x &&
-        object.getBottomSafety() <= this.boundary_y + this.boundary_height &&
-        object.getTopSafety() >= boundary_y
+        object.getTopSafety() <= this.boundary_y + this.boundary_height &&
+        object.getBottomSafety() >= boundary_y
       ) {
         object.setLeft(this.boundary_x);
       }
-
-
+      // inner right
       if (
         object.getRight() > this.boundary_x + this.boundary_width &&
         object.getPrevRight() <= this.boundary_x + this.boundary_width &&
@@ -97,6 +98,25 @@ window.addEventListener("load", function () {
       ) {
         object.setRight(this.boundary_x + this.boundary_width);
       }
+      // outer left
+      if (
+        object.getRight() > this.boundary_x &&
+        object.getPrevRight() <= this.boundary_x &&
+        object.getTopSafety() <= this.boundary_y + this.boundary_height &&
+        object.getBottomSafety() >= this.boundary_y
+      ) {
+        object.setRight(this.boundary_x);
+      }
+      // outer bottom
+      if (
+        object.getRightSafety() > this.boundary_x &&
+        object.getLeftSafety() < this.boundary_x + this.boundary_width &&
+        object.getTop() < this.boundary_y + this.boundary_height &&
+        object.getPrevTop() >= this.boundary_y + this.boundary_height
+      ) {
+        object.setTop(this.boundary_y + this.boundary_height);
+      }
+      // outer right
       if (
         object.getLeft() < this.boundary_x + this.boundary_width &&
         object.getPrevLeft() >= this.boundary_x + this.boundary_width &&
@@ -105,7 +125,7 @@ window.addEventListener("load", function () {
       ) {
         object.setLeft(this.boundary_x + this.boundary_width);
       }
-
+      // outer top
       if (
         object.getLeftSafety() > this.boundary_x &&
         object.getRightSafety() < this.boundary_x + this.boundary_width &&
@@ -115,29 +135,6 @@ window.addEventListener("load", function () {
       ) {
         object.setBottom(this.boundary_y + this.boundary_height);
       }
-      if (
-        object.getRightSafety() > this.boundary_x &&
-        object.getLeftSafety() < this.boundary_x + this.boundary_width &&
-        object.getTop() < this.boundary_y + this.boundary_height &&
-        object.getBottom() > this.boundary_y + this.boundary_height &&
-        object.getPrevTop() >= this.boundary_y + this.boundary_height
-      ) {
-        object.setTop(this.boundary_y + this.boundary_height);
-      }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
       if (
         !(object.getTop() < this.boundary_y) ||
@@ -286,14 +283,15 @@ window.addEventListener("load", function () {
     };
   };
 
+  //prettier-ignore
   const world = new World("img/tilemaps/beach.png", 112, 112, 94, 94, 5, [
     ["AA", "CO", "CA", "AN", "AH", "DN", "DN", "DN", "DN", "DN", "DN", "DN", "DN", "DN", "DN", "BI", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
     ["AB", "BB", "CB", "AN", "AI", "EN", "EN", "AJ", "FF", "FF", "BJ", "EN", "EN", "EN", "EN", "BH", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
     ["AC", "BC", "CC", "CN", "AH", "FN", "FN", "BI", "AO", "BO", "CI", "FN", "FN", "FN", "FN", "BI", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
     ["AD", "HN", "CD", "AN", "AI", "GN", "GN", "DI", "AP", "BP", "CI", "GN", "GN", "GN", "GN", "BH", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
     ["AN", "AN", "AN", "AN", "AH", "DN", "DN", "AK", "FG", "GG", "BK", "DN", "DN", "DN", "DN", "BI", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
-    ["AN", "BN", "AN", "AN", "AM", "AF", "BF", "CF", "DF", "AF", "BF", "CF", "DF", "AF", "BF", "BH", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
-    ["CN", "AN", "AN", "CN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "BM", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
+    ["AN", "BN", "AN", "AN", "AM", "AF", "BF", "CF", "DF", "AF", "BF", "CF", "DF", "AF", "BF", "BM", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
+    ["CN", "AN", "AN", "CN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
     ["AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "BN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
     ["AN", "AN", "AN", "BN", "AN", "AN", "CN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
   ]);
@@ -447,7 +445,6 @@ window.addEventListener("load", function () {
     Animator.call(this, this.animation, 7, "loop");
     this.dist = Math.hypot(player.y - this.ey, player.x - this.ex);
     this.update = function () {
-
       this.ex += ((player.y - this.ey) / this.dist) * this.speed;
       this.ex += ((player.x - this.ex) / this.dist) * this.speed;
     };
@@ -832,7 +829,7 @@ window.addEventListener("load", function () {
     this.update = function () {
       switch (this.state) {
         case "follow":
-        this.count++;
+          this.count++;
           if (player.getBottom() > this.getTop()) {
             if (
               this.animation != this.animations["walkright"] &&
@@ -859,24 +856,23 @@ window.addEventListener("load", function () {
           }
           if (this.count == 120) {
             this.count = 0;
-            this.state = 'rest';
+            this.state = "rest";
           }
           break;
 
         case "rest":
-            this.changeAnimation(this.animations["yawn"], "loop");
+          this.changeAnimation(this.animations["yawn"], "loop");
 
-            this.restcount++;
+          this.restcount++;
 
-            if (this.restcount == 180) {
-              this.restcount = 0;
-              this.state = 'follow';
-            }
+          if (this.restcount == 180) {
+            this.restcount = 0;
+            this.state = "follow";
+          }
           break;
       }
     };
   };
-
 
   const enemy = new SlidingCat(1000, 100);
   const enemy2 = new ShootingCat(1000, 100);
@@ -890,21 +886,32 @@ window.addEventListener("load", function () {
     this.y = 0;
     this.width = 500;
     this.height = 500;
-    this.aspectRatio = 0.25;
-    //    canvas.width = 1034 canvas.height = 658
+    this.blindspot = 50;
+
+    this.setCamera = function () {
+      if (player.getRight() > this.x + this.width - this.blindspot)
+        this.x += player.speed;
+      if (player.getBottom() > this.y + this.width - this.blindspot)
+        this.y += player.speed;
+      if (player.getLeft() < this.x + this.blindspot) this.x -= player.speed;
+      if (player.getTop() < this.y + this.blindspot) this.y -= player.speed;
+      this.repositionCamera();
+    };
+
     this.moveCamera = function (dx, dy) {
-      if (!(world.colliding == false)) {
+      if (player.prevX != player.x || player.prevY != player.y) {
+        console.log(player.prevX, player.x);
         if (
-          player.x > world.map[0].length * world.tileWidth * this.aspectRatio &&
-          player.x <
-            world.map[0].length * world.tileWidth * (1 - this.aspectRatio)
+          player.getLeft() > this.blindspot &&
+          player.getRight() <
+            world.map[0].length * world.tileWidth - this.blindspot
         ) {
           this.x += dx;
         }
         if (
-          player.y > world.map.length * world.tileHeight * this.aspectRatio &&
-          player.y <
-            world.map.length * world.tileHeight * (1 - this.aspectRatio)
+          player.getTop() > this.blindspot &&
+          player.getBottom() <
+            world.map.length * world.tileHeight - this.blindspot
         ) {
           this.y += dy;
         }
@@ -921,8 +928,8 @@ window.addEventListener("load", function () {
       if (this.x < 0) {
         this.x = 0;
       }
-      if (this.x > world.map[0].length * world.tileWidth) {
-        this.x = world.map[0].length * world.tileWidth;
+      if (this.x > world.map[0].length * world.tileWidth - this.width) {
+        this.x = world.map[0].length * world.tileWidth - this.width;
       }
     };
   };
@@ -933,7 +940,6 @@ window.addEventListener("load", function () {
   let damageCooldown = 0;
   //let pause = false;
   const update = function () {
-          console.log(world.map.length);
     enemy.prevX = enemy.x;
     enemy.prevY = enemy.y;
     enemy2.prevX = enemy2.x;
@@ -955,7 +961,7 @@ window.addEventListener("load", function () {
       if (!hdirection.includes("right") && !hdirection.includes("left"))
         player.changeAnimation(player.animations["walkdown"], "loop");
       player.moveDown();
-      camera.moveCamera(0, player.speed);
+      //camera.moveCamera(0, player.speed)
       if (vdirection.includes("down") == false) {
         vdirection.push("down");
       }
@@ -968,7 +974,7 @@ window.addEventListener("load", function () {
       if (!hdirection.includes("right") && !hdirection.includes("left"))
         player.changeAnimation(player.animations["walkup"], "loop");
       player.moveUp();
-      camera.moveCamera(0, -player.speed);
+      //camera.moveCamera(0, -player.speed)
       if (vdirection.includes("up") == false) {
         vdirection.push("up");
       }
@@ -980,7 +986,7 @@ window.addEventListener("load", function () {
     if (controller.right.active) {
       player.changeAnimation(player.animations["walkright"], "loop");
       player.moveRight();
-      camera.moveCamera(player.speed, 0);
+      //camera.moveCamera(player.speed, 0)
       if (hdirection.includes("right") == false) {
         hdirection.push("right");
       }
@@ -992,7 +998,7 @@ window.addEventListener("load", function () {
     if (controller.left.active) {
       player.changeAnimation(player.animations["walkleft"], "loop");
       player.moveLeft();
-      camera.moveCamera(-player.speed, 0);
+      //camera.moveCamera(-player.speed, 0)
       if (hdirection.includes("left") == false) {
         hdirection.push("left");
       }
@@ -1057,13 +1063,17 @@ window.addEventListener("load", function () {
       damageCooldown = 0;
     }
 
-    [world.boundary, /*world.worldboundary*/, world.hillboundary, world.waterboundary].forEach(
-      (boundary) => {
-        [player, enemy, enemy2, enemy3].forEach((object) => {
-          boundary.collide(object);
-        });
-      }
-    );
+    [
+      world.boundary,
+      world.worldboundary,
+      world.hillboundary,
+      world.waterboundary,
+    ].forEach((boundary) => {
+      [player, enemy, enemy2, enemy3].forEach((object) => {
+        boundary.collide(object);
+      });
+    });
+    camera.setCamera();
   };
 
   const render = function () {
