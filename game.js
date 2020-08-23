@@ -313,6 +313,17 @@ window.addEventListener('load', function () {
     ["AN", "AN", "AN", "BN", "AN", "AN", "CN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
   ]);
 
+    const gameover = new Object('img/death.jpg',0, 0, 500, 500);
+    gameover.opacity = 0;
+    gameover.update = function () {
+
+      if (player.totalHearts <= 0) {
+        this.opacity += 0.05;
+      } else {
+        this.opacity = 0;
+      }
+    }
+
     const MovingObject = function (
         url,
         x,
@@ -453,7 +464,9 @@ window.addEventListener('load', function () {
 
     const Bullet = function (x, y) {
         MovingObject.call(this, 'img/cats/furball.png', x, y, 56, 56, 6)
-
+        let dist = Math.hypot(player.x - x, player.y - y)
+        this.vx = (player.x - x) / dist ;
+        this.vy = (player.y - y) / dist
         this.animations = {
             spin: [
                 new Frame(32 * 0, 32 * 0, 32, 32),
@@ -465,8 +478,8 @@ window.addEventListener('load', function () {
         Animator.call(this, this.animation, 7, 'loop')
         this.dist = Math.hypot(player.y - this.y, player.x - this.x)
         this.update = function () {
-            this.x += ((player.x - this.x) / this.dist) * this.speed
-            this.y += ((player.y - this.y) / this.dist) * this.speed
+            this.x += this.vx * this.speed * 1.5
+            this.y += this.vy * this.speed * 1.5
         }
     }
     const SlidingCat = function (x, y) {
@@ -825,10 +838,9 @@ window.addEventListener('load', function () {
                             'pause'
                         )
                     }
-                    if (this.count == 30) {
+                    if (this.count == 60) {
                         this.shooting = true
-                        console.log('shooting')
-                        this.bullets.push(new Bullet(this.x, this.y))
+                        this.bullets.push(new Bullet(this.getCenterX(), this.getCenterY()))
                         this.count = 0
                     }
                     if (
@@ -919,6 +931,8 @@ window.addEventListener('load', function () {
         this.state = 'follow'
 
         this.update = function () {
+          console.log(gameover.opacity);
+
             switch (this.state) {
                 case 'follow':
                     this.count++
@@ -1154,6 +1168,7 @@ window.addEventListener('load', function () {
         }
         enemy2.update()
         enemy3.update()
+        gameover.update()
         ;[enemy].forEach((object) => {
             if (player.collideObject(object) && damageCooldown == 0) {
                 player.totalHearts -= 1
@@ -1167,6 +1182,12 @@ window.addEventListener('load', function () {
             }
         })
         ;[enemy3].forEach((object) => {
+            if (player.collideObject(object) && damageCooldown == 0) {
+                player.totalHearts -= 1
+                damageCooldown = 30
+            }
+        })
+        enemy2.bullets.forEach((object) => {
             if (player.collideObject(object) && damageCooldown == 0) {
                 player.totalHearts -= 1
                 damageCooldown = 30
@@ -1257,6 +1278,8 @@ window.addEventListener('load', function () {
             enemy2.height
         )
 
+
+
         context.drawImage(
             enemy3.sprite,
             enemy3.frame.source_x,
@@ -1310,65 +1333,79 @@ window.addEventListener('load', function () {
                 )
             })
         }
+        context.save()
+        context.globalAlpha = gameover.opacity
+        context.drawImage(
+            gameover.sprite,
+            0,
+            0,
+            630,
+            630,
+            gameover.x,
+            gameover.y,
+            gameover.width,
+            gameover.height
+        )
+        context.restore()
 
-        context.strokeStyle = '#000000'
-        context.beginPath()
-        context.rect(
-            world.doorway.getLeft() - camera.x,
-            world.doorway.getTop() - camera.y,
-            world.doorway.getRight() - world.doorway.getLeft(),
-            world.doorway.getBottom() - world.doorway.getTop()
-        )
-        context.stroke()
-        context.beginPath()
-        context.rect(
-            player.getLeft() - camera.x,
-            player.getTop() - camera.y,
-            player.getRight() - player.getLeft(),
-            player.getBottom() - player.getTop()
-        )
-        context.stroke()
-        context.beginPath()
-        context.rect(
-            enemy.getLeft() - camera.x,
-            enemy.getTop() - camera.y,
-            enemy.getRight() - enemy.getLeft(),
-            enemy.getBottom() - enemy.getTop()
-        )
-
-        context.stroke()
-        context.beginPath()
-        context.rect(
-            enemy2.getLeft() - camera.x,
-            enemy2.getTop() - camera.y,
-            enemy2.getRight() - enemy2.getLeft(),
-            enemy2.getBottom() - enemy2.getTop()
-        )
-        context.stroke()
-        context.beginPath()
-        context.rect(
-            enemy3.getLeft() - camera.x,
-            enemy3.getTop() - camera.y,
-            enemy3.getRight() - enemy3.getLeft(),
-            enemy3.getBottom() - enemy3.getTop()
-        )
-        context.stroke()
-        context.strokeStyle = '#FF0000'
-
-        context.rect(
-            enemy.getLeft() - camera.x - world.tileWidth,
-            enemy.getTop() - camera.y - world.tileHeight,
-            enemy.getRight() + world.tileWidth * 2 - enemy.getLeft(),
-            enemy.getBottom() + world.tileHeight * 2 - enemy.getTop()
-        )
-        context.rect(
-            enemy2.getLeft() - camera.x - 3 * world.tileWidth,
-            enemy2.getTop() - camera.y - 3 * world.tileHeight,
-            enemy2.getRight() + 3 * world.tileWidth * 2 - enemy2.getLeft(),
-            enemy2.getBottom() + 3 * world.tileHeight * 2 - enemy2.getTop()
-        )
-
-        context.stroke()
+        // context.strokeStyle = '#000000'
+        // context.beginPath()
+        // context.rect(
+        //     world.doorway.getLeft() - camera.x,
+        //     world.doorway.getTop() - camera.y,
+        //     world.doorway.getRight() - world.doorway.getLeft(),
+        //     world.doorway.getBottom() - world.doorway.getTop()
+        // )
+        // context.stroke()
+        // context.beginPath()
+        // context.rect(
+        //     player.getLeft() - camera.x,
+        //     player.getTop() - camera.y,
+        //     player.getRight() - player.getLeft(),
+        //     player.getBottom() - player.getTop()
+        // )
+        // context.stroke()
+        // context.beginPath()
+        // context.rect(
+        //     enemy.getLeft() - camera.x,
+        //     enemy.getTop() - camera.y,
+        //     enemy.getRight() - enemy.getLeft(),
+        //     enemy.getBottom() - enemy.getTop()
+        // )
+        //
+        // context.stroke()
+        // context.beginPath()
+        // context.rect(
+        //     enemy2.getLeft() - camera.x,
+        //     enemy2.getTop() - camera.y,
+        //     enemy2.getRight() - enemy2.getLeft(),
+        //     enemy2.getBottom() - enemy2.getTop()
+        // )
+        // context.stroke()
+        // context.beginPath()
+        // context.rect(
+        //     enemy3.getLeft() - camera.x,
+        //     enemy3.getTop() - camera.y,
+        //     enemy3.getRight() - enemy3.getLeft(),
+        //     enemy3.getBottom() - enemy3.getTop()
+        // )
+        // context.stroke()
+        // context.strokeStyle = '#FF0000'
+        //
+        // context.rect(
+        //     enemy.getLeft() - camera.x - world.tileWidth,
+        //     enemy.getTop() - camera.y - world.tileHeight,
+        //     enemy.getRight() + world.tileWidth * 2 - enemy.getLeft(),
+        //     enemy.getBottom() + world.tileHeight * 2 - enemy.getTop()
+        // )
+        // context.rect(
+        //     enemy2.getLeft() - camera.x - 3 * world.tileWidth,
+        //     enemy2.getTop() - camera.y - 3 * world.tileHeight,
+        //     enemy2.getRight() + 3 * world.tileWidth * 2 - enemy2.getLeft(),
+        //     enemy2.getBottom() + 3 * world.tileHeight * 2 - enemy2.getTop()
+        // )
+        //
+        // context.stroke()
     }
 
     //create engine object
