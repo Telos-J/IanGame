@@ -307,7 +307,7 @@ window.addEventListener('load', function () {
     ["AC", "BC", "CC", "CN", "AH", "FN", "FN", "BI", "AO", "BO", "CI", "FN", "FN", "FN", "FN", "BI", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
     ["AD", "HN", "CD", "AN", "AI", "GN", "GN", "DI", "AP", "BP", "CI", "GN", "GN", "GN", "GN", "BH", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
     ["AN", "AN", "AN", "AN", "AH", "DN", "DN", "AK", "FG", "GG", "BK", "DN", "DN", "DN", "DN", "BI", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
-    ["AN", "BN", "AN", "AN", "AM", "AF", "BF", "CF", "DF", "AF", "BF", "CF", "DF", "AF", "BF", "BH", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
+    ["AN", "BN", "AN", "AN", "AM", "AF", "BF", "CF", "DF", "AF", "BF", "CF", "DF", "AF", "BF", "BM", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
     ["CN", "AN", "AN", "CN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
     ["AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "BN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
     ["AN", "AN", "AN", "BN", "AN", "AN", "CN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
@@ -870,7 +870,6 @@ window.addEventListener('load', function () {
         this.offset_right = 30
         this.offset_top = 45
         this.speed = 4.5
-        this.restcount = 0
 
         this.animations = {
             walkdown: [
@@ -929,13 +928,15 @@ window.addEventListener('load', function () {
         Animator.call(this, this.animation, 7, 'loop')
 
         this.state = 'follow'
+        this.restcount = 0
+        this.runcount = 0
 
         this.update = function () {
-          console.log(gameover.opacity);
+          console.log(enemy3.runcount);
 
             switch (this.state) {
                 case 'follow':
-                    this.count++
+                    this.runcount++
                     if (player.getBottom() > this.getTop()) {
                         if (
                             this.animation != this.animations['walkright'] &&
@@ -972,8 +973,9 @@ window.addEventListener('load', function () {
                         )
                         this.moveLeft()
                     }
-                    if (this.count == 120) {
-                        this.count = 0
+
+                    if (this.runcount == 90) {
+                        this.runcount = 0
                         this.state = 'rest'
                     }
                     break
