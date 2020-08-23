@@ -451,25 +451,22 @@ window.addEventListener('load', function () {
     //create player object
     const player = new Player('img/dog.png')
 
-    const Bullet = function (ex, ey) {
-        MovingObject.call(this, 'img/cats/furball.png', ex, ex, 56, 56, 6)
-        this.ex = ex
-        this.ey = ey
-        this.speed = 6
+    const Bullet = function (x, y) {
+        MovingObject.call(this, 'img/cats/furball.png', x, y, 56, 56, 6)
 
         this.animations = {
             spin: [
                 new Frame(32 * 0, 32 * 0, 32, 32),
-                new Frame(32 * 1, 32 * 2, 32, 32),
-                new Frame(32 * 2, 32 * 2, 32, 32),
+                new Frame(32 * 1, 32 * 0, 32, 32),
+                new Frame(32 * 2, 32 * 0, 32, 32),
             ],
         }
         this.animation = this.animations['spin']
         Animator.call(this, this.animation, 7, 'loop')
-        this.dist = Math.hypot(player.y - this.ey, player.x - this.ex)
+        this.dist = Math.hypot(player.y - this.y, player.x - this.x)
         this.update = function () {
-            this.ex += ((player.y - this.ey) / this.dist) * this.speed
-            this.ex += ((player.x - this.ex) / this.dist) * this.speed
+            this.x += ((player.x - this.x) / this.dist) * this.speed
+            this.y += ((player.y - this.y) / this.dist) * this.speed
         }
     }
     const SlidingCat = function (x, y) {
@@ -691,6 +688,8 @@ window.addEventListener('load', function () {
         this.offset_top = 45
         this.speed = 1.5
         this.count = 0
+        this.shooting = false
+        this.bullets = []
         this.animations = {
             walkdown: [
                 new Frame(32 * 0, 32 * 0, 32, 32),
@@ -827,7 +826,9 @@ window.addEventListener('load', function () {
                         )
                     }
                     if (this.count == 30) {
-                        const bullet = new Bullet(this.x, this.y)
+                        this.shooting = true
+                        console.log('shooting')
+                        this.bullets.push(new Bullet(this.x, this.y))
                         this.count = 0
                     }
                     if (
@@ -1143,6 +1144,14 @@ window.addEventListener('load', function () {
         }
         player.animate()
         enemy.animate()
+        enemy2.animate()
+        enemy3.animate()
+        if (enemy2.shooting) {
+            enemy2.bullets.forEach((bullet) => {
+                bullet.animate()
+                bullet.update()
+            })
+        }
         enemy2.update()
         enemy3.update()
         ;[enemy].forEach((object) => {
@@ -1284,6 +1293,22 @@ window.addEventListener('load', function () {
                 heart.width,
                 heart.height
             )
+        }
+
+        if (enemy2.shooting) {
+            enemy2.bullets.forEach((bullet) => {
+                context.drawImage(
+                    bullet.sprite,
+                    bullet.frame.source_x,
+                    bullet.frame.source_y,
+                    bullet.frame.source_width,
+                    bullet.frame.source_height,
+                    bullet.x - camera.x,
+                    bullet.y - camera.y,
+                    bullet.width,
+                    bullet.height
+                )
+            })
         }
 
         context.strokeStyle = '#000000'
