@@ -1,3 +1,4 @@
+@@ -0,0 +1,1366 @@
 window.addEventListener('load', function () {
     //Get a CanvasRenerContext2D object
     const canvas = document.querySelector('canvas')
@@ -132,7 +133,7 @@ window.addEventListener('load', function () {
             ) {
                 object.setLeft(this.boundary_x + this.boundary_width)
             }
-            // inner top
+            // outer top
             if (
                 object.getLeftSafety() > this.boundary_x &&
                 object.getRightSafety() <
@@ -1363,7 +1364,7 @@ window.addEventListener('load', function () {
         )
         context.rect(
             enemy2.getLeft() - camera.x - 3 * world.tileWidth,
-            enemy2.getTop() - camera.y - 3 * world.tileHeight,
+            enemy2.getTop() - camera.y - 3 * world.tileHeight,1
             enemy2.getRight() + 3 * world.tileWidth * 2 - enemy2.getLeft(),
             enemy2.getBottom() + 3 * world.tileHeight * 2 - enemy2.getTop()
         )
