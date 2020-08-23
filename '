@@ -132,7 +132,7 @@ window.addEventListener('load', function () {
             ) {
                 object.setLeft(this.boundary_x + this.boundary_width)
             }
-            // inner top
+            // outer top
             if (
                 object.getLeftSafety() > this.boundary_x &&
                 object.getRightSafety() <
