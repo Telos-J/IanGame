@@ -447,7 +447,7 @@ window.addEventListener("load", function () {
     Animator.call(this, this.animation, 7, "loop");
     this.dist = Math.hypot(player.y - this.ey, player.x - this.ex);
     this.update = function () {
-      console.log("hey");
+
       this.ex += ((player.y - this.ey) / this.dist) * this.speed;
       this.ex += ((player.x - this.ex) / this.dist) * this.speed;
     };
@@ -933,6 +933,7 @@ window.addEventListener("load", function () {
   let damageCooldown = 0;
   //let pause = false;
   const update = function () {
+          console.log(world.map.length);
     enemy.prevX = enemy.x;
     enemy.prevY = enemy.y;
     enemy2.prevX = enemy2.x;
