@@ -302,15 +302,15 @@ window.addEventListener('load', function () {
 
     //prettier-ignore
     const world = new World("img/tilemaps/beach.png", 112, 112, 94, 94, 5, [
-    ["AA", "CO", "CA", "AN", "AH", "DN", "DN", "DN", "DN", "DN", "DN", "DN", "DN", "DN", "DN", "BI", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
-    ["AB", "BB", "CB", "AN", "AI", "EN", "EN", "AJ", "FF", "FF", "BJ", "EN", "EN", "EN", "EN", "BH", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
-    ["AC", "BC", "CC", "CN", "AH", "FN", "FN", "BI", "AO", "BO", "CI", "FN", "FN", "FN", "FN", "BI", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
-    ["AD", "HN", "CD", "AN", "AI", "GN", "GN", "DI", "AP", "BP", "CI", "GN", "GN", "GN", "GN", "BH", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
-    ["AN", "AN", "AN", "AN", "AH", "DN", "DN", "AK", "FG", "GG", "BK", "DN", "DN", "DN", "DN", "BI", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
-    ["AN", "BN", "AN", "AN", "AM", "AF", "BF", "CF", "DF", "AF", "BF", "CF", "DF", "AF", "BF", "BM", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
-    ["CN", "AN", "AN", "CN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
-    ["AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "BN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
-    ["AN", "AN", "AN", "BN", "AN", "AN", "CN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN"],
+    ["AA", "CO", "CA", "AN", "AH", "DN", "DN", "DN", "DN", "DN", "DN", "DN", "DN", "DN", "DN", "BI", "AN", "AN", "AN", "AN", "CH", "BH", "AN", "AN", "AN", "AN"],
+    ["AB", "BB", "CB", "AN", "AI", "EN", "EN", "AJ", "FF", "FF", "BJ", "EN", "EN", "EN", "EN", "BH", "AN", "AL", "BL", "AN", "CH", "BH", "AN", "AL", "BL", "AN"],
+    ["AC", "BC", "CC", "CN", "AH", "FN", "FN", "BI", "AO", "BO", "CI", "FN", "FN", "FN", "FN", "BI", "AN", "CH", "BH", "AN", "CH", "BH", "AN", "CH", "BH", "AN"],
+    ["AD", "HN", "CD", "AN", "AI", "GN", "GN", "DI", "AP", "BP", "CI", "GN", "GN", "GN", "GN", "BH", "AN", "CH", "BH", "AN", "CH", "BH", "AN", "CH", "BH", "AN"],
+    ["AN", "AN", "AN", "AN", "AH", "DN", "DN", "AK", "FG", "GG", "BK", "DN", "DN", "DN", "DN", "BI", "AN", "CH", "BH", "AN", "CH", "BH", "AN", "CH", "BH", "AN"],
+    ["AN", "BN", "AN", "AN", "AM", "AF", "BF", "CF", "DF", "AF", "BF", "CF", "DF", "AF", "BF", "BM", "AN", "CH", "BH", "AN", "CH", "BH", "AN", "CH", "BH", "AN"],
+    ["CN", "AN", "AN", "CN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "CH", "BH", "AN", "CH", "BH", "AN", "CH", "BH", "AN"],
+    ["AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "BN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "CH", "BH", "AN", "AM", "BM", "AN", "CH", "BH", "AN"],
+    ["AN", "AN", "AN", "BN", "AN", "AN", "CN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "AN", "CH", "BH", "AN", "AN", "AN", "AN", "CH", "BH", "AN"],
   ]);
 
     const gameover = new Object('img/death.jpg',0, 0, 500, 500);
